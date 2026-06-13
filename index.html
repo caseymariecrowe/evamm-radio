@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EVAMM Radio</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .logo { margin-top: 50px; width: 200px; }
+    .logo img { width: 100%; display: block; }
+    .season-title {
+      margin-top: 10px;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #666;
+    }
+    .season-years {
+      margin-top: 4px;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: #444;
+    }
+    .player {
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+    .play-btn {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .play-btn:hover { background: #fff; }
+    .play-btn:hover svg path,
+    .play-btn:hover svg rect { fill: #000; }
+    .play-btn svg { width: 24px; height: 24px; }
+    .play-btn svg path,
+    .play-btn svg rect { fill: #fff; transition: fill 0.2s; }
+    .episode-info {
+      margin-top: 48px;
+      text-align: center;
+      width: 320px;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+    .episode-info.visible { opacity: 1; }
+    .episode-id { font-size: 10px; color: #444; letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 10px; }
+    .episode-dj { font-size: 15px; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .episode-meta { font-size: 11px; color: #888; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1.6; margin-bottom: 8px; }
+    .episode-countdown { font-size: 11px; color: #555; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 2px; }
+    .episode-links {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .episode-links a {
+      font-size: 8px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #fff;
+      text-decoration: none;
+      border-bottom: 1px solid #444;
+      padding-bottom: 2px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .episode-links a:hover { color: #aaa; border-color: #aaa; }
+    audio { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="logo">
+    <img src="EVAMM_Logo_Morphed.jpg" alt="EVAMM Radio" />
+  </div>
+  <div class="season-title">Season 1</div>
+  <div class="season-years">2023 – 2026</div>
+
+  <div class="player">
+    <button class="play-btn" id="playBtn" aria-label="Play">
+      <svg id="playIcon" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg>
+      <svg id="stopIcon" viewBox="0 0 24 24" style="display:none;"><rect x="5" y="5" width="14" height="14" rx="1"/></svg>
+    </button>
+  </div>
+
+  <div class="episode-info" id="episodeInfo">
+    <div class="episode-id" id="episodeID"></div>
+    <div class="episode-dj" id="episodeDJ"></div>
+    <div class="episode-meta">
+      <span id="episodeDate"></span>
+    </div>
+    <div class="episode-countdown" id="episodeCountdown"></div>
+    <div class="episode-links" id="episodeLinks"></div>
+  </div>
+
+  <audio id="audio" src=""></audio>
+
+  <script>
+    const episodes = [
+      {
+            "ep": "EVAMM03",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/6ws3c7bkk7wu5chx9se9k/EVAMM03_EvaMyraMay.mp3?rlkey=wysmopm0kg9e5d4beblbqawg1",
+            "dj": "Eva Myra May",
+            "date": "Jun 15, 2023",
+            "duration": "1h 31m",
+            "durationSecs": 5474,
+            "youtube": "https://www.youtube.com/watch?v=qIyS2iCBUc8",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM04",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/efvb7vlaiyqh7qcbm4ce2/EVAMM04_EvaMyraMay_DJBeats.mp3?rlkey=6wuwb1y0kdaes3yeeubfwboxn",
+            "dj": "Eva Myra May & DJBeats",
+            "date": "Jun 15, 2023",
+            "duration": "1h 4m",
+            "durationSecs": 3857,
+            "youtube": "https://www.youtube.com/watch?v=7cLAoHj3mgs&t=1936s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  },
+                  {
+                        "name": "DJBeats",
+                        "url": "https://soundcloud.com/shadeaux_glo"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM05",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/6xvd775499dqw4vygja07/EVAMM05_gloworm_EvaMyraMay.mp3?rlkey=k011t69tqw0datdw0b5snk7t0",
+            "dj": "gloworm & Eva Myra May",
+            "date": "Jun 15, 2023",
+            "duration": "1h 16m",
+            "durationSecs": 4619,
+            "youtube": "https://www.youtube.com/watch?v=rHfdAjC_7aU&t=1558s",
+            "soundcloudLinks": [
+                  {
+                        "name": "gloworm",
+                        "url": "https://soundcloud.com/shadeaux_glo"
+                  },
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM06",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/nk0umdi9nq0wu8ivbzgt4/EVAMM06_EvaMyraMay_EthicalDrvgs.mp3?rlkey=ch3czg9ypf4dwj7lkgbf4a2am",
+            "dj": "Eva Myra May & Ethical Drvgs",
+            "date": "Jun 20, 2023",
+            "duration": "1h 3m",
+            "durationSecs": 3794,
+            "youtube": "https://www.youtube.com/watch?v=SVls0A0keFE&t=1900s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  },
+                  {
+                        "name": "Ethical Drvgs",
+                        "url": "https://soundcloud.com/ethicaldrvgs"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM07",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/y0vdx7t6o1slnug81h50u/EVAMM07_DemonTimeCEO_Eva_Myra_May.mp3?rlkey=bz8kx4bzjzbqu4y3jgwtprnpm",
+            "dj": "Demon Time CEO & Eva Myra May",
+            "date": "Jun 21, 2023",
+            "duration": "1h",
+            "durationSecs": 3633,
+            "youtube": "https://www.youtube.com/watch?v=EJjAPpQDDuY&t=2959s&pp=0gcJCUELAYcqIYzv",
+            "soundcloudLinks": [
+                  {
+                        "name": "Demon Time CEO",
+                        "url": "https://soundcloud.com/shadeaux_glo"
+                  },
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM08",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/f6nsdnwxu6qrvmlz3pi3v/EVAMM08_Noisepup_EvaMyraMay.mp3?rlkey=qoaz9vhac3ky5y1wnpapxphps",
+            "dj": "Noisepup & Eva Myra May",
+            "date": "Jun 29, 2023",
+            "duration": "1h 3m",
+            "durationSecs": 3788,
+            "youtube": "https://www.youtube.com/watch?v=wp-CgPUvc2c&t=2983s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Noisepup",
+                        "url": "https://www.instagram.com/noisepup/"
+                  },
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM09",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/ldff7ds0jmle8ofyq3x4v/EVAMM09_Mija_Bloody_EvaMyraMay.mp3?rlkey=a6xeuwz9c3um8fuzk40890r9n",
+            "dj": "Mija & Bloody & Eva Myra May",
+            "date": "Jun 29, 2023",
+            "duration": "1h 5m",
+            "durationSecs": 3903,
+            "youtube": "https://www.youtube.com/watch?v=-Out9AkwFHE&t=2822s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Mija",
+                        "url": "https://soundcloud.com/hi_mija"
+                  },
+                  {
+                        "name": "Bloody",
+                        "url": "https://soundcloud.com/bloodyalright"
+                  },
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM10",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/4sh4pql71dstf1tnkrlwz/EVAMM10_Succubus_Infernx_EvaMyraMay.mp3?rlkey=0yaig5oyii7l0d7he24n6g8o5",
+            "dj": "Succubus & Infernx & Eva Myra May",
+            "date": "Jul 4, 2023",
+            "duration": "1h 1m",
+            "durationSecs": 3673,
+            "youtube": "https://www.youtube.com/watch?v=_4-zcU7Hga4&t=3388s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Succubus",
+                        "url": "https://soundcloud.com/theonlysuccubus"
+                  },
+                  {
+                        "name": "Infernx",
+                        "url": "https://soundcloud.com/dantesinfernx"
+                  },
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM11",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/yaq773jj28vy5hv431w4h/EVAMM11_EvaMyraMay_Mija.mp3?rlkey=j0229cyuf15bpruhrk95em6ak",
+            "dj": "Eva Myra May & Mija",
+            "date": "Apr 4, 2024",
+            "duration": "52m",
+            "durationSecs": 3126,
+            "youtube": "https://www.youtube.com/watch?v=2GgNenefx0I&t=1833s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  },
+                  {
+                        "name": "Mija",
+                        "url": "https://soundcloud.com/hi_mija"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM12",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/4mjf9gvvqcguqo34u1j8y/EVAMM12_EthicalDrvgs_EvaMyraMay.mp3?rlkey=z3eo62mtaguqsna5zevh0wzdr",
+            "dj": "Ethical Drvgs & Eva Myra May",
+            "date": "Apr 6, 2024",
+            "duration": "1h 3m",
+            "durationSecs": 3789,
+            "youtube": "https://www.youtube.com/watch?v=4TBx3jxjSVc&t=1217s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Ethical Drvgs",
+                        "url": "https://soundcloud.com/ethicaldrvgs"
+                  },
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM13",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/5y5ecqidr16j9ek5yx9ge/EVAMM13_EvaMyraMay.mp3?rlkey=lp9f5wwpy4eca7hmbesu0fvjo",
+            "dj": "Eva Myra May",
+            "date": "Apr 7, 2024",
+            "duration": "1h 1m",
+            "durationSecs": 3662,
+            "youtube": "https://www.youtube.com/watch?v=9uffucUYVys&t=20s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM14",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/8tum6e7sdgpqyfmtzglqm/EVAMM14_EvaMyraMay.mp3?rlkey=d6akre5kwg3kwn0pw2kdulyl2",
+            "dj": "Eva Myra May",
+            "date": "Apr 8, 2024",
+            "duration": "1h 12m",
+            "durationSecs": 4324,
+            "youtube": "https://www.youtube.com/watch?v=jRxPKnAUxJs&t=4s&pp=0gcJCUELAYcqIYzv",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM15",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/04nl9nq1j23w57mwamx6w/EVAMM15_EvaMyraMay.mp3?rlkey=uov96inbhv414cx8fs6h8rjnl",
+            "dj": "Eva Myra May",
+            "date": "Apr 11, 2024",
+            "duration": "1h 45m",
+            "durationSecs": 6310,
+            "youtube": "https://www.youtube.com/watch?v=9tmhM-52uXo&t=5769s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM16",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/3zz8leqyp77gs55oyc7kf/EVAMM16_EricLodwick.mp3?rlkey=4mhtwikegrsj2o6lc38x0jryp",
+            "dj": "Eric Lodwick",
+            "date": "Apr 14, 2024",
+            "duration": "2h 8m",
+            "durationSecs": 7720,
+            "youtube": "https://www.youtube.com/watch?v=v1B069X94b0&t=2847s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eric Lodwick",
+                        "url": "https://soundcloud.com/ericlodwick"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM17",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/tiff7y20qf465c4h4rqyz/EVAMM17_EvaMyraMay_JacobGrosse.mp3?rlkey=fsz08h8ss25sj59r7i0nm164y",
+            "dj": "Eva Myra May & Jacob Grosse",
+            "date": "Jul 28, 2024",
+            "duration": "1h 2m",
+            "durationSecs": 3724,
+            "youtube": "https://www.youtube.com/watch?v=25MC793foJM&t=3003s&pp=0gcJCUELAYcqIYzv",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  },
+                  {
+                        "name": "Jacob Grosse",
+                        "url": "https://soundcloud.com/jacobgrosse"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM18",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/n5to15q10zmoty2qq2yt7/EVAMM18_EvaMyraMay.mp3?rlkey=z4xh9o3gku8gmn9vsu43fi400",
+            "dj": "Eva Myra May",
+            "date": "Jul 29, 2024",
+            "duration": "1h 2m",
+            "durationSecs": 3740,
+            "youtube": "https://www.youtube.com/watch?v=JxzL7AwYeMY&t=1074s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM19",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/3woe069bdepri9yp3bf00/EVAMM19_EthicalDrvgs_EvaMyraMay.mp3?rlkey=vlkf0bn5ak403ogwnxgfgezw3",
+            "dj": "Ethical Drvgs & Eva Myra May",
+            "date": "Oct 2, 2024",
+            "duration": "1h 3m",
+            "durationSecs": 3818,
+            "youtube": "https://www.youtube.com/watch?v=MaIUfFlTS4Y&t=1836s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Ethical Drvgs",
+                        "url": "https://soundcloud.com/ethicaldrvgs"
+                  },
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM20",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/ipfl3yb8m5rpivehtn8i2/EVAMM20_coldsweat_EvaMyraMay_Morelia.mp3?rlkey=r0kydklup3hucr049m40s22dn",
+            "dj": "coldsweat & Morelia & Eva Myra May",
+            "date": "Oct 5, 2024",
+            "duration": "1h 47m",
+            "durationSecs": 6421,
+            "youtube": "https://www.youtube.com/watch?v=aGYnaJ6VBUo&t=5587s",
+            "soundcloudLinks": [
+                  {
+                        "name": "coldsweat",
+                        "url": "https://soundcloud.com/cold_sweat"
+                  },
+                  {
+                        "name": "Morelia",
+                        "url": "https://soundcloud.com/morelia"
+                  },
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM21",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/7a1r4t9xret4srxduqml1/EVAMM21_KittyLogic_EvaMyraMay.mp3?rlkey=dr875a47fsxwm1ly76lwl9ugg",
+            "dj": "Kitty Logic & Eva Myra May",
+            "date": "Oct 18, 2024",
+            "duration": "1h 1m",
+            "durationSecs": 3719,
+            "youtube": "https://www.youtube.com/watch?v=DKUwJdjPznE&t=2659s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Kitty Logic",
+                        "url": "https://soundcloud.com/kitty_logic"
+                  },
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM22",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/ywhkm6nsec4dajqasxfir/EVAMM22_coldsweat_EvaMyraMay.mp3?rlkey=h158kzik47tfto05x0a2j230x",
+            "dj": "coldsweat & Eva Myra May",
+            "date": "Oct 19, 2024",
+            "duration": "1h 47m",
+            "durationSecs": 6453,
+            "youtube": "https://www.youtube.com/watch?v=mwXLdyhUXFs&t=1136s",
+            "soundcloudLinks": [
+                  {
+                        "name": "coldsweat",
+                        "url": "https://soundcloud.com/cold_sweat"
+                  },
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM23",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/3k993nbolvwyfalv4sw7d/EVAMM23_VegaDelanova.mp3?rlkey=zygv8tf3cbfankocls6qmyoou",
+            "dj": "Vega Delanova",
+            "date": "Oct 20, 2024",
+            "duration": "45m",
+            "durationSecs": 2709,
+            "youtube": "https://www.youtube.com/watch?v=srF-qPLsttg&t=1492s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Vega Delanova",
+                        "url": "https://soundcloud.com/vegadelanova"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM24",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/dlt2wgjdv3wupa25h2wl9/EVAMM24_tsGOexclamationpoint.mp3?rlkey=fvnvhj7nks3bqmcgka45dymyk",
+            "dj": "ts GOexclamationpoint",
+            "date": "Oct 20, 2024",
+            "duration": "1h 4m",
+            "durationSecs": 3880,
+            "youtube": "https://www.youtube.com/watch?v=W687DttGjr8&t=1454s",
+            "soundcloudLinks": [
+                  {
+                        "name": "ts GOexclamationpoint",
+                        "url": "https://soundcloud.com/tsgoexclamationmark"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM25",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/wkz35ltwmgznn6c8tvjzg/EVAMM25_Zivi.mp3?rlkey=do46b8pts2m4gt12m6sitabdd",
+            "dj": "Zivi",
+            "date": "Oct 31, 2024",
+            "duration": "1h",
+            "durationSecs": 3659,
+            "youtube": "https://www.youtube.com/watch?v=fMiDqg2vsAI&t=24s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Zivi",
+                        "url": "https://soundcloud.com/zivirecords"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM26",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/reucrd6w3rzwkxi0sxkxr/EVAMM26_JacobGrosse_heelbite316.mp3?rlkey=cpnewo1ydsopnu7qb34uhkrlh",
+            "dj": "Jacob Grosse & heelbite316",
+            "date": "Nov 14, 2024",
+            "duration": "2h 33m",
+            "durationSecs": 9237,
+            "youtube": "https://www.youtube.com/watch?v=aean2L65RDY&t=3297s&pp=0gcJCUELAYcqIYzv",
+            "soundcloudLinks": [
+                  {
+                        "name": "Jacob Grosse",
+                        "url": "https://soundcloud.com/jacobgrosse"
+                  },
+                  {
+                        "name": "heelbite316",
+                        "url": "https://soundcloud.com/heelbite316"
+                  }
+            ]
+      },
+      {
+            "ep": "EVMM27",
+            "src": "EVAMM_Season1_AudioFiles/EVMM27_Morelia_PixieDust.mp3",
+            "dj": "Morelia & Pixie Dust",
+            "date": "Nov 15, 2024",
+            "duration": "1h 3m",
+            "durationSecs": 3783,
+            "youtube": "https://www.youtube.com/watch?v=43TAn6vmzgw&t=77s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Morelia",
+                        "url": "https://soundcloud.com/morelia"
+                  },
+                  {
+                        "name": "Pixie Dust",
+                        "url": "https://soundcloud.com/dj_pixiedust"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM28",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/6oo2znpagwwaco9kvf96n/EVAMM28_coldsweat.mp3?rlkey=udyhnhodnckekjj5vnajie0kb",
+            "dj": "coldsweat",
+            "date": "Nov 22, 2024",
+            "duration": "1h 30m",
+            "durationSecs": 5432,
+            "youtube": "https://www.youtube.com/watch?v=qguzhAd6zDg&t=19s",
+            "soundcloudLinks": [
+                  {
+                        "name": "coldsweat",
+                        "url": "https://soundcloud.com/cold_sweat"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM29",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/2iqdlgicl67rdk73rcmdw/EVAMM29_gloworm.mp3?rlkey=j1qt7jtht327f4i8iyc4rpm2s",
+            "dj": "gloworm",
+            "date": "Nov 29, 2024",
+            "duration": "1h 1m",
+            "durationSecs": 3691,
+            "youtube": "https://www.youtube.com/watch?v=KWtDsN1sfuk&t=283s",
+            "soundcloudLinks": [
+                  {
+                        "name": "gloworm",
+                        "url": "https://soundcloud.com/shadeaux_glo"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM30",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/7rnexnja5fqs9pouvgk78/EVAMM30_EvaMyraMay.mp3?rlkey=q8c9vr5qblvtuv0qi3ua4myd8",
+            "dj": "Eva Myra May",
+            "date": "Dec 16, 2024",
+            "duration": "1h 11m",
+            "durationSecs": 4289,
+            "youtube": "https://www.youtube.com/watch?v=b7UrFi_5JTE&t=242s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM31",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/lw21s4m53tjn3k5nvh4rb/EVAMM31_EvaMyraMay.mp3?rlkey=kncx78qh17z8mf0v5udp6b2qe",
+            "dj": "Eva Myra May",
+            "date": "Dec 17, 2024",
+            "duration": "1h",
+            "durationSecs": 3655,
+            "youtube": "https://www.youtube.com/watch?v=puczZbY2G00&pp=0gcJCUELAYcqIYzv",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM33",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/2y5w84w9kkn3veg1uavry/EVAMM33_bibidiscoteca.mp3?rlkey=3j68s73w3woh3u2e52pl2ovzl",
+            "dj": "bibidiscoteca",
+            "date": "Dec 20, 2024",
+            "duration": "1h 1m",
+            "durationSecs": 3707,
+            "youtube": "https://www.youtube.com/watch?v=T5EyUlyfLxM&t=42s",
+            "soundcloudLinks": [
+                  {
+                        "name": "bibidiscoteca",
+                        "url": "https://soundcloud.com/blasia-discoteca"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM34",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/br8rwvzszzlp7h5loha1r/EVAMM34_EhticalDrvgs_LindaLo.mp3?rlkey=wp1ovj7vgcavbf9f7q84nyvpj",
+            "dj": "Ehtical Drvgs & Linda Lo",
+            "date": "Dec 20, 2024",
+            "duration": "48m",
+            "durationSecs": 2920,
+            "youtube": "https://www.youtube.com/watch?v=PNccreimkKY&t=1540s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Ehtical Drvgs",
+                        "url": "https://soundcloud.com/ethicaldrvgs"
+                  },
+                  {
+                        "name": "Linda Lo",
+                        "url": "https://soundcloud.com/linda_lo"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM35",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/aaazvfj5xllv8skhf8gby/EVAMM35_tsGOexclamationpoint.mp3?rlkey=og85gcdbo63ty30pjvicynvjw",
+            "dj": "ts GOexclamationpoint",
+            "date": "Dec 20, 2024",
+            "duration": "1h 8m",
+            "durationSecs": 4085,
+            "youtube": "https://www.youtube.com/watch?v=clbzTGZxWO8&t=3473s",
+            "soundcloudLinks": [
+                  {
+                        "name": "ts GOexclamationpoint",
+                        "url": "https://soundcloud.com/tsgoexclamationmark"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM36",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/x2c8hc171nm4atsv3firv/EVAMM36_androcided_webmistress.mp3?rlkey=lq237ggx2q2z07s8i4oz310r9",
+            "dj": "androcided & webmistress",
+            "date": "Dec 20, 2024",
+            "duration": "1h 3m",
+            "durationSecs": 3825,
+            "youtube": "https://www.youtube.com/watch?v=pNtRXz85ZPI&t=45s",
+            "soundcloudLinks": [
+                  {
+                        "name": "androcided",
+                        "url": "https://soundcloud.com/androcided"
+                  },
+                  {
+                        "name": "webmistress",
+                        "url": "https://soundcloud.com/webmistress-official"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM37",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/m87h8qvjn8yh1zhhr94pt/EVAMM37_EthicalDrvgs.mp3?rlkey=1z6h8ah1rlnwiwjzkq0873v22",
+            "dj": "Ethical Drvgs",
+            "date": "Dec 20, 2024",
+            "duration": "1h 13m",
+            "durationSecs": 4394,
+            "youtube": "https://www.youtube.com/watch?v=bRyw9oE0Iro&t=2s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Ethical Drvgs",
+                        "url": "https://soundcloud.com/ethicaldrvgs"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM38",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/9x095vjh831esu6ppzcer/EVAMM38_gloworm.mp3?rlkey=9lkphr5nkinji9y3p64m7w82x",
+            "dj": "gloworm",
+            "date": "Dec 30, 2024",
+            "duration": "1h 4m",
+            "durationSecs": 3899,
+            "youtube": "https://www.youtube.com/watch?v=x14I-PJP9FI&t=3403s",
+            "soundcloudLinks": [
+                  {
+                        "name": "gloworm",
+                        "url": "https://soundcloud.com/shadeaux_glo"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM39",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/3oo4gpwjgp0pwgg3x19z5/EVAMM39_teamjacob0.mp3?rlkey=fkvm224m03vitis3tew0uv3hw",
+            "dj": "teamjacob0",
+            "date": "Jan 15, 2025",
+            "duration": "45m",
+            "durationSecs": 2704,
+            "youtube": "https://www.youtube.com/watch?v=a5fjhPhyI6A&t=1s",
+            "soundcloudLinks": [
+                  {
+                        "name": "teamjacob0",
+                        "url": "https://soundcloud.com/stevesucks"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM40",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/x82n1t49rpa3sum0djjtx/EVAMM40_EvaMyraMay.mp3?rlkey=gpceiilpskl61zgbmv5rm1ruw",
+            "dj": "Eva Myra May",
+            "date": "Feb 18, 2025",
+            "duration": "1h 4m",
+            "durationSecs": 3854,
+            "youtube": "https://www.youtube.com/watch?v=lA5NYyq-Bps&t=260s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM41",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/wuhvt2pww4x3ohaggnih0/EVAMM41_AshleyAnngora.mp3?rlkey=qgo0pjd7am4zzqwqbd3vbpazo",
+            "dj": "Ashley Anngora",
+            "date": "Feb 25, 2025",
+            "duration": "55m",
+            "durationSecs": 3307,
+            "youtube": "https://www.youtube.com/watch?v=CdiAmurAJiM&t=31s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Ashley Anngora",
+                        "url": "https://soundcloud.com/ashleyanngora"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM42",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/n8bgy3qq1onozm1kodw50/EVAMM42_DesaDeca.mp3?rlkey=dnlmvp2dm91uuwj48rxc504ys",
+            "dj": "Desa Deca",
+            "date": "Mar 3, 2025",
+            "duration": "1h 6m",
+            "durationSecs": 3991,
+            "youtube": "",
+            "soundcloudLinks": [
+                  {
+                        "name": "Desa Deca",
+                        "url": "https://soundcloud.com/desadeca"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM43",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/m5ek48kw7r8e10rar6ml5/EVAMM43_EvaMyraMay.mp3?rlkey=bsyo61edbws476179s1n2mc0m",
+            "dj": "Eva Myra May",
+            "date": "May 7, 2025",
+            "duration": "59m",
+            "durationSecs": 3541,
+            "youtube": "https://www.youtube.com/watch?v=eS5vY62I1d0&t=31s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM44",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/yixqv3rwoz8npst2sxxa1/EVAMM44Innerkid.mp3?rlkey=537tiaocpyfiscp68r1qm0vr8",
+            "dj": "Innerkid",
+            "date": "Mar 10, 2025",
+            "duration": "48m",
+            "durationSecs": 2916,
+            "youtube": "https://www.youtube.com/watch?v=QnzDBW3Wz6I&t=2671s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Innerkid",
+                        "url": "https://soundcloud.com/neilkasp"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM45",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/nj6m25jkdrhilsqj5h97a/EVAMM45_DIZI.mp3?rlkey=lp4hboie1d80ufoie101myqj0",
+            "dj": "DIZI",
+            "date": "Mar 19, 2025",
+            "duration": "1h 9m",
+            "durationSecs": 4151,
+            "youtube": "https://www.youtube.com/watch?v=qWaXNDZuk0M&t=4s",
+            "soundcloudLinks": [
+                  {
+                        "name": "DIZI",
+                        "url": "https://soundcloud.com/ddiizzii"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM46",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/0zt3grifrp06ik3xhkbxu/EVAMM46_JacobGrosse.mp3?rlkey=my14wow2xgpa6eyclllzpl5k1",
+            "dj": "Jacob Grosse",
+            "date": "Mar 26, 2025",
+            "duration": "1h 1m",
+            "durationSecs": 3688,
+            "youtube": "https://www.youtube.com/watch?v=nDFuNVbe5kU&t=2088s&pp=0gcJCUELAYcqIYzv",
+            "soundcloudLinks": [
+                  {
+                        "name": "Jacob Grosse",
+                        "url": "https://soundcloud.com/jacobgrosse"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM47",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/i6vtolm30np6i3cyjlec9/EVAMM47_coldsweat.mp3?rlkey=10cd7w255mbihjrynz9dzb2dc",
+            "dj": "coldsweat",
+            "date": "Mar 26, 2025",
+            "duration": "1h 2m",
+            "durationSecs": 3752,
+            "youtube": "https://www.youtube.com/watch?v=CCA3Nf8RiU0&t=1s",
+            "soundcloudLinks": [
+                  {
+                        "name": "coldsweat",
+                        "url": "https://soundcloud.com/cold_sweat"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM48",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/22r8n9kbfuy4jxgd7f9dz/EVAMM48_hardbopnymph.mp3?rlkey=pyqj2l5u8vkx34db6rv1ni2cw",
+            "dj": "hardbopnymph",
+            "date": "May 2, 2025",
+            "duration": "1h 7m",
+            "durationSecs": 4054,
+            "youtube": "https://www.youtube.com/watch?v=zFKNIAIT65Q&t=1264s",
+            "soundcloudLinks": [
+                  {
+                        "name": "hardbopnymph",
+                        "url": "https://soundcloud.com/perfect_man"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM49",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/xdkmmmwsmndg8xod5o68w/EVAMM49_f1shifty_EvaMyraMay.mp3?rlkey=0mjz2hrpspsu0q6pbz1aym798",
+            "dj": "f1shifty & Eva Myra May",
+            "date": "May 2, 2025",
+            "duration": "1h 6m",
+            "durationSecs": 3991,
+            "youtube": "https://www.youtube.com/watch?v=_uUks9r56lQ&t=2199s",
+            "soundcloudLinks": [
+                  {
+                        "name": "f1shifty",
+                        "url": "https://soundcloud.com/lordf1shifty"
+                  },
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM50",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/2k02mhnongmmgu2zy70xf/EVAMM50_EvaMyraMay.mp3?rlkey=z3r35hbh0iv1t4h2xs0mw5h70",
+            "dj": "Eva Myra May",
+            "date": "Jun 30, 2025",
+            "duration": "1h 12m",
+            "durationSecs": 4372,
+            "youtube": "https://www.youtube.com/watch?v=r5Yc7vk77c4&t=3270s&pp=0gcJCUELAYcqIYzv",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM51",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/6d8u59nlcricjvp66irox/EVAMM51_EvaMyraMay.mp3?rlkey=5r052k904ssyym5f37a0nj5ue",
+            "dj": "Eva Myra May",
+            "date": "Jul 4, 2025",
+            "duration": "1h 8m",
+            "durationSecs": 4119,
+            "youtube": "https://www.youtube.com/watch?v=v3oc7YMfBeo&t=2397s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM52",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/enlskxm0ql6j80l6899tu/EVAMM52_allmyoppsare10s.mp3?rlkey=jypk3amqit142laq8lnt87hqy",
+            "dj": "allmyoppsare10s",
+            "date": "Jul 5, 2025",
+            "duration": "1h 41m",
+            "durationSecs": 6117,
+            "youtube": "https://www.youtube.com/watch?v=I5Rz2wtQDLQ&t=1s",
+            "soundcloudLinks": []
+      },
+      {
+            "ep": "EVAMM53",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/zpiuzy3pbxa6w7i75jaa8/EVAMM53_PrettyGayFriendly_EvaMyraMay.mp3?rlkey=me9y0fh1n9gy8ua2n8mfi6a5g",
+            "dj": "Pretty Gay Friendly & Eva Myra May",
+            "date": "Jul 6, 2025",
+            "duration": "1h 12m",
+            "durationSecs": 4321,
+            "youtube": "https://www.youtube.com/watch?v=LmtD9g7ZAGw&t=1426s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Pretty Gay Friendly",
+                        "url": "https://soundcloud.com/prettygayfriendly"
+                  },
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM54",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/wiclj2q8ecv770z82yll1/EVAMM54_pinche.mp3?rlkey=2iwqj2qmsi9l8oumk0w85ez3s",
+            "dj": "pinche",
+            "date": "Jul 15, 2025",
+            "duration": "1h 4m",
+            "durationSecs": 3876,
+            "youtube": "https://www.youtube.com/watch?v=t5crHVeleTU&t=2538s",
+            "soundcloudLinks": [
+                  {
+                        "name": "pinche",
+                        "url": "https://soundcloud.com/adam-morello-reyes"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM55",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/yugd1db78xya2jhrl988a/EVAMM55_weepingwillowtree.mp3?rlkey=g7onza40ok9dqgtr8m93dwc11",
+            "dj": "weepingwillowtree",
+            "date": "Aug 12, 2025",
+            "duration": "1h 10m",
+            "durationSecs": 4247,
+            "youtube": "https://www.youtube.com/watch?v=XliZEtwNkKo&t=32s",
+            "soundcloudLinks": [
+                  {
+                        "name": "weepingwillowtree",
+                        "url": "https://soundcloud.com/weepingwillowtree"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM56",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/9vdx113w1fju418bgsf4g/EVAMM56_YourMuther.mp3?rlkey=rqkx5kp277wa5b5ob2eehrwhh",
+            "dj": "Your Muther",
+            "date": "Aug 19, 2025",
+            "duration": "49m",
+            "durationSecs": 2964,
+            "youtube": "https://www.youtube.com/watch?v=UfjwR6dgAEA&t=45s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Your Muther",
+                        "url": "https://soundcloud.com/yourmuther"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM57a",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/1uamu0cilmj0xvl4b9u6c/EVAMM57a_JoshPeace.mp3?rlkey=ax15a5i7f9qj9qmfu372gmdrp",
+            "dj": "Josh Peace",
+            "date": "Aug 19, 2025",
+            "duration": "1h 14m",
+            "durationSecs": 4444,
+            "youtube": "https://www.youtube.com/watch?v=f48sF3Lo1-E&t=4253s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Josh Peace",
+                        "url": "https://soundcloud.com/djjoshpeace"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM57b",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/irstrgwnrl2qaaco656ac/EVAMM57b_tsGOexclamationpoint.mp3?rlkey=8hlhosujlq0yuxelms6jiw9qv",
+            "dj": "ts GOexclamationpoint",
+            "date": "Aug 22, 2025",
+            "duration": "1h 5m",
+            "durationSecs": 3902,
+            "youtube": "https://www.youtube.com/watch?v=oMsQn-RTKT0&t=11s",
+            "soundcloudLinks": [
+                  {
+                        "name": "ts GOexclamationpoint",
+                        "url": "https://soundcloud.com/tsgoexclamationmark"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM58",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/n5w06giiygwmqfl2wa1dm/EVAMM58_ESL.mp3?rlkey=pogj482f0nnm13s0pwvrc9slc",
+            "dj": "ESL",
+            "date": "Sep 1, 2025",
+            "duration": "47m",
+            "durationSecs": 2868,
+            "youtube": "https://www.youtube.com/watch?v=9DseBQ6rPF8&t=31s",
+            "soundcloudLinks": [
+                  {
+                        "name": "ESL",
+                        "url": "https://soundcloud.com/esl-1"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM59",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/9zuxxpxlaqe9qit784p3h/EVAMM59_LindaLo.mp3?rlkey=dctrlsobkz3rqumxe464v3947",
+            "dj": "Linda Lo",
+            "date": "Sep 3, 2025",
+            "duration": "1h 4m",
+            "durationSecs": 3853,
+            "youtube": "https://www.youtube.com/watch?v=WTiDEyIi65w&t=862s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Linda Lo",
+                        "url": "https://soundcloud.com/linda_lo"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM60",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/vapau8pnvonoir5leddyo/EVAMM60_WADOOD.mp3?rlkey=57zt2gujxiq7j7wz6hrckppu4",
+            "dj": "WADOOD",
+            "date": "Sep 6, 2025",
+            "duration": "1h 7m",
+            "durationSecs": 4043,
+            "youtube": "https://www.youtube.com/watch?v=JQkq0NbtZ2E&t=1491s",
+            "soundcloudLinks": [
+                  {
+                        "name": "WADOOD",
+                        "url": "https://soundcloud.com/wadood-2"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM61",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/t10krmfxc6z03ho7yt9cj/EVAMM61_ESL_tsGOexclamationpoint.mp3?rlkey=rezihorsxp6p0vw97ofaed87b",
+            "dj": "ESL & ts GOexclamationpoint",
+            "date": "Oct 24, 2025",
+            "duration": "1h 57m",
+            "durationSecs": 7064,
+            "youtube": "https://www.youtube.com/watch?v=0e61npRsyfk&t=6067s",
+            "soundcloudLinks": [
+                  {
+                        "name": "ESL",
+                        "url": "https://soundcloud.com/esl-1"
+                  },
+                  {
+                        "name": "ts GOexclamationpoint",
+                        "url": "https://soundcloud.com/tsgoexclamationmark"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM62",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/amr3s1iv4p91zxiabzr7s/EVAMM62_Barto.mp3?rlkey=eff5nfbwakre34cq2ufa8v83u",
+            "dj": "Barto",
+            "date": "Oct 24, 2025",
+            "duration": "1h 19m",
+            "durationSecs": 4761,
+            "youtube": "https://www.youtube.com/watch?v=0kulQK_OLyU&t=586s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Barto",
+                        "url": "https://soundcloud.com/ih8barto"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM63",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/49c1szf7xlysapad1doco/EVAMM63_Omo.mp3?rlkey=d7xw9fx5eremlortderip994i",
+            "dj": "Omo",
+            "date": "Oct 24, 2025",
+            "duration": "1h 7m",
+            "durationSecs": 4028,
+            "youtube": "https://www.youtube.com/watch?v=1JtY_BYwHL4&t=28s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Omo",
+                        "url": "https://soundcloud.com/videomo"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM64",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/l77l2c2hkn9s5yooc2u5u/EVAMM64_Beeflounge.mp3?rlkey=0va976n1sylux8chlkxggpuh6",
+            "dj": "Beeflounge",
+            "date": "Oct 24, 2025",
+            "duration": "54m",
+            "durationSecs": 3282,
+            "youtube": "https://www.youtube.com/watch?v=rseO7eR-OlY&t=2s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Beeflounge",
+                        "url": "https://soundcloud.com/beef_lounge"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM65",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/v5tkxb6rh7885r9qbcbtp/EVAMM65_coldsweat.mp3?rlkey=o6vmbwtf3mlfhz21borx0usyg",
+            "dj": "coldsweat",
+            "date": "Oct 29, 2025",
+            "duration": "1h 5m",
+            "durationSecs": 3923,
+            "youtube": "https://www.youtube.com/watch?v=i9nbI6vT9_I&t=1192s",
+            "soundcloudLinks": [
+                  {
+                        "name": "coldsweat",
+                        "url": "https://soundcloud.com/cold_sweat"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM66",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/y81kc22qsn4qse0bq3j4w/EVAMM66_LindaLo_Pollensource_EvaMyraMay_Cister.mp3?rlkey=densgm8mx2e3ugkmfhllh4siw",
+            "dj": "Linda Lo & Pollensource & Eva Myra May & Cister",
+            "date": "Oct 29, 2025",
+            "duration": "3h 43m",
+            "durationSecs": 13421,
+            "youtube": "https://www.youtube.com/watch?v=Hv3_5iFsSfA&t=8975s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Linda Lo",
+                        "url": "https://soundcloud.com/linda_lo"
+                  },
+                  {
+                        "name": "Pollensource",
+                        "url": "https://soundcloud.com/pollensource"
+                  },
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM67",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/zasw853prarwyhuhmt43g/EVAMM67_EvaMyraMay.mp3?rlkey=3agbzrrn0686plmg1h2z4ijlu",
+            "dj": "Eva Myra May",
+            "date": "Oct 29, 2025",
+            "duration": "1h 3m",
+            "durationSecs": 3822,
+            "youtube": "https://www.youtube.com/watch?v=QhsBFXDUBr0&t=466s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM68",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/ge7g6qcftkvuslsgvvd8w/EVAMM68_EthicalDrvgs.mp3?rlkey=se7xchg4olnzcqh2stg8nfn81",
+            "dj": "Ethical Drvgs",
+            "date": "Oct 30, 2025",
+            "duration": "1h 31m",
+            "durationSecs": 5514,
+            "youtube": "https://www.youtube.com/watch?v=QcbINKthqk8&t=13s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Ethical Drvgs",
+                        "url": "https://soundcloud.com/ethicaldrvgs"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM69",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/j3ubdl57mg5uazmmfgto5/EVAMM69_Wormfood_Remix_Release_Party.mp3?rlkey=b7deub21g3zus68q4u6k5o8d5",
+            "dj": "Worm Food Remix Release Party",
+            "date": "Oct 30, 2025",
+            "duration": "4h 28m",
+            "durationSecs": 16094,
+            "youtube": "https://www.youtube.com/watch?v=U8GKhtmkegg&t=5782s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Worm Food Remix Release Party",
+                        "url": "https://lindalo.bandcamp.com/?label=642269512&tab=artists"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM70",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/s9hz8j4xzh4a6dtgip1l7/EVAMM70_EvaMyraMay.mp3?rlkey=uxyj0yaqm2zxs4fwei4avv9r6",
+            "dj": "Eva Myra May",
+            "date": "Oct 31, 2025",
+            "duration": "2h 10m",
+            "durationSecs": 7838,
+            "youtube": "https://www.youtube.com/watch?v=r9f9HsL-VEw&t=1634s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM71",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/zd0emmot3f4iw3rha3opt/EVAMM71_ESL_EvaMyraMaymp4.mp3?rlkey=znw4gzf679c0ovsob1axooko3",
+            "dj": "ESL & Eva Myra May",
+            "date": "Nov 2, 2025",
+            "duration": "1h 29m",
+            "durationSecs": 5380,
+            "youtube": "https://www.youtube.com/watch?v=uDaoeNZw4SY&t=832s",
+            "soundcloudLinks": [
+                  {
+                        "name": "ESL",
+                        "url": "https://soundcloud.com/esl-1"
+                  },
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM72",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/1s9w5nfpbz8fbdfp6d1kd/EVAMM72_PrivacySettings.mp3?rlkey=fj6ieyy4hy895dte9pv210wuz",
+            "dj": "Privacy Settings",
+            "date": "Nov 3, 2025",
+            "duration": "59m",
+            "durationSecs": 3596,
+            "youtube": "https://www.youtube.com/watch?v=74hTXUnDBg0&t=25s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Privacy Settings",
+                        "url": "https://soundcloud.com/privacysettings"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM73",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/2fbsf5bjsgse9lvrc879y/EVAMM73_LowHangingFruit.mp3?rlkey=2js3job4mzi6o0c0wts3an7a4",
+            "dj": "Low Hanging Fruit",
+            "date": "Nov 11, 2025",
+            "duration": "2h 6m",
+            "durationSecs": 7603,
+            "youtube": "https://www.youtube.com/watch?v=NfuXyZO_8S8&t=1571s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Low Hanging Fruit",
+                        "url": "https://soundcloud.com/prettygayfriendly/low-hanging-fruit-valentines"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM74",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/d0hsejn6pw1ffgqmuo3rq/EVAMM74_PrivacySettings_ESL_EvaMyraMay.mp3?rlkey=ku6tx4c2y2gxyuw8obhrxjrte",
+            "dj": "Privacy Settings & ESL & Eva Myra May",
+            "date": "Nov 11, 2025",
+            "duration": "1h 3m",
+            "durationSecs": 3824,
+            "youtube": "https://www.youtube.com/watch?v=Mc8z9d8_nVI&t=557s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Privacy Settings",
+                        "url": "https://soundcloud.com/privacysettings"
+                  },
+                  {
+                        "name": "ESL",
+                        "url": "https://soundcloud.com/esl-1"
+                  },
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM75",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/lat0ry9ubpm0vsnlsycmz/EVAMM75_EvaMyraMay.mp3?rlkey=mk87rtpqmpd0btjmdnh0j3v6u",
+            "dj": "Eva Myra May",
+            "date": "Nov 11, 2025",
+            "duration": "1h 13m",
+            "durationSecs": 4421,
+            "youtube": "https://www.youtube.com/watch?v=XH2IfK_hUP0&t=1954s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM76",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/8iaw98ktd5vrdh8fkf6ho/EVAMM76_hardbopnymph.mp3?rlkey=ubyq29ltfmkho7e4hmfvdae6a",
+            "dj": "hardbopnymph",
+            "date": "Nov 17, 2025",
+            "duration": "1h 17m",
+            "durationSecs": 4629,
+            "youtube": "https://www.youtube.com/watch?v=HIyfgFMS-z4&t=10s",
+            "soundcloudLinks": [
+                  {
+                        "name": "hardbopnymph",
+                        "url": "https://soundcloud.com/perfect_man"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM77",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/oh4i3xqndaqqru4e0pup8/EVAMM77_ShanaSarett.mp3?rlkey=3bbuhtm7h3boh3elhsd3ftto4",
+            "dj": "Shana Sarett",
+            "date": "Nov 17, 2025",
+            "duration": "1h 13m",
+            "durationSecs": 4380,
+            "youtube": "https://www.youtube.com/watch?v=36kBqlYJRx0&t=2677s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Shana Sarett",
+                        "url": "https://soundcloud.com/user-843594654"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM78",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/8rupccags9ckhwvxua8bu/EVAMM78_BabyWeight.mp3?rlkey=7stctqj72x56jezlpj7jjwmtq",
+            "dj": "Baby Weight",
+            "date": "Nov 21, 2025",
+            "duration": "1h 22m",
+            "durationSecs": 4967,
+            "youtube": "https://www.youtube.com/watch?v=mftlgvJPKSk&t=3901s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Baby Weight",
+                        "url": "https://soundcloud.com/babyweightmusic"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM79",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/huny3nv7yeledyc445pso/EVAMM79_Succubus.mp3?rlkey=aiei143xixydbios1mwjknp2q",
+            "dj": "Succubus",
+            "date": "Nov 22, 2025",
+            "duration": "1h",
+            "durationSecs": 3652,
+            "youtube": "https://www.youtube.com/watch?v=AydeKNN3x4E&t=4s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Succubus",
+                        "url": "https://soundcloud.com/theonlysuccubus"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM80",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/vw4l8gfbghoey0h7cau73/EVAMM80_EvaMyraMay.mp3?rlkey=w6bw1ddobi36n4i8kox4a6npz",
+            "dj": "Eva Myra May",
+            "date": "Nov 24, 2025",
+            "duration": "59m",
+            "durationSecs": 3574,
+            "youtube": "https://www.youtube.com/watch?v=FYhuVc44jpw&t=1201s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM81",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/lyqb3gxosnxufjbhq0n7u/EVAMM81_EvaMyraMay.mp3?rlkey=tuzfapcnu9k8kbfkq16nls535",
+            "dj": "Eva Myra May",
+            "date": "Dec 1, 2025",
+            "duration": "1h",
+            "durationSecs": 3633,
+            "youtube": "https://www.youtube.com/watch?v=4Wvd-prc-V0&t=44s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM82",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/t81f57aomgjzoeyn5yawp/EVAMM82_allmyoppsare10s.mp3?rlkey=qlt3901wc2rtvjtlnd097rfb4",
+            "dj": "allmyoppsare10s",
+            "date": "Dec 8, 2025",
+            "duration": "1h 44m",
+            "durationSecs": 6282,
+            "youtube": "https://www.youtube.com/watch?v=OqsUZV6CTRY&t=37s",
+            "soundcloudLinks": []
+      },
+      {
+            "ep": "EVAMM83",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/b83rfe0478ystf8e677pq/EVAMM83_JoshPeace.mp3?rlkey=6pf4kvankina9k2y68ka8jj4p",
+            "dj": "Josh Peace",
+            "date": "Dec 11, 2025",
+            "duration": "1h 5m",
+            "durationSecs": 3958,
+            "youtube": "https://www.youtube.com/watch?v=G3Y3La_fG1o&t=30s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Josh Peace",
+                        "url": "https://soundcloud.com/djjoshpeace"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM84",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/7hymd2703nrwfv70avh26/EVAMM84_YourMuther.mp3?rlkey=ajtfk3oqdhq4rm82mmuuwme56",
+            "dj": "Your Muther",
+            "date": "Dec 28, 2025",
+            "duration": "46m",
+            "durationSecs": 2773,
+            "youtube": "https://www.youtube.com/watch?v=k67qZJAwNhg&t=42s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Your Muther",
+                        "url": "https://soundcloud.com/yourmuther"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM85",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/fg32a853r5tarp03dy0bl/EVAMM85_EvaMyraMay.mp3?rlkey=7xy7bp4mjw3ob39sfhwrfrx8h",
+            "dj": "Eva Myra May",
+            "date": "Dec 28, 2025",
+            "duration": "54m",
+            "durationSecs": 3256,
+            "youtube": "https://www.youtube.com/watch?v=YJOKXr_Sp7U&t=14s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM86",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/52j547glx6ued6u8x4ld9/EVAMM86_LilyArdalan.mp3?rlkey=3bqrp4o6t0yf6999yvewvlyxc",
+            "dj": "Lily Ardalan",
+            "date": "Mar 20, 2026",
+            "duration": "1h 5m",
+            "durationSecs": 3952,
+            "youtube": "https://www.youtube.com/watch?v=cxEwR4VyUCc&t=8s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Lily Ardalan",
+                        "url": "https://soundcloud.com/lilyardalan"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM87",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/iom0cowz7pxa79e5w9zlq/EVAMM87_5p3c141.mp3?rlkey=idq2pzau73zlad32iprq7dsop",
+            "dj": "5p3c141",
+            "date": "Mar 20, 2026",
+            "duration": "1h 1m",
+            "durationSecs": 3665,
+            "youtube": "https://www.youtube.com/watch?v=NGKkou8L7MQ&t=2473s",
+            "soundcloudLinks": [
+                  {
+                        "name": "5p3c141",
+                        "url": "https://soundcloud.com/fendianajones"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM88",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/1h7zl0zm58pif2tt5xknv/EVAMM88_Seanathan.mp3?rlkey=lq19m8rkel8zbr8zckxqesg2k",
+            "dj": "Seanathan",
+            "date": "Mar 20, 2026",
+            "duration": "1h 7m",
+            "durationSecs": 4021,
+            "youtube": "https://www.youtube.com/watch?v=UCZPsbkASPE&t=1332s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Seanathan",
+                        "url": "https://soundcloud.com/seanathanmusic"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM89",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/ym3ly0g88inl28ghu2xmq/EVAMM89_tsGOexlamationpoint.mp3?rlkey=asiqwi5805uqrk0vk6qrxhx4r",
+            "dj": "ts GOexlamationpoint",
+            "date": "Mar 20, 2026",
+            "duration": "1h 2m",
+            "durationSecs": 3761,
+            "youtube": "https://www.youtube.com/watch?v=Do6rYlLo6e0&t=3380s",
+            "soundcloudLinks": [
+                  {
+                        "name": "ts GOexlamationpoint",
+                        "url": "https://soundcloud.com/tsgoexclamationmark"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM90",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/g0arnag5fr1v0mvzdzrgd/EVAMM90_LindaLo_AviLoud.mp3?rlkey=01kjbky468wrc3nq8hybtn76k",
+            "dj": "Linda Lo & Avi Loud",
+            "date": "Mar 20, 2026",
+            "duration": "1h 3m",
+            "durationSecs": 3810,
+            "youtube": "https://www.youtube.com/watch?v=FTPA8O1XbcE&t=2849s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Linda Lo",
+                        "url": "https://soundcloud.com/linda_lo"
+                  },
+                  {
+                        "name": "Avi Loud",
+                        "url": "https://soundcloud.com/aviloud"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM91",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/4rwzaf9q3pp178hfg0tar/EVAMM91_EvaMyraMay.mp3?rlkey=7707kwzxyv0ga1l0r5lnw5zni",
+            "dj": "Eva Myra May",
+            "date": "Mar 21, 2026",
+            "duration": "1h 1m",
+            "durationSecs": 3676,
+            "youtube": "https://www.youtube.com/watch?v=bOzNjLsn1m0&t=761s",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM92",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/hsj7r7mzu5q51zxy170ii/EVAMM92_MININ.mp3?rlkey=4tb5kxgcoy9vpzhxvqnkxiobv",
+            "dj": "MININ",
+            "date": "May 21, 2026",
+            "duration": "38m",
+            "durationSecs": 2298,
+            "youtube": "https://www.youtube.com/watch?v=kV8xIfzyFLQ&t=1506s",
+            "soundcloudLinks": [
+                  {
+                        "name": "MININ",
+                        "url": "https://soundcloud.com/minin_la"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM93",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/9stk2br4w8xexibixaxi6/EVAMM93_slowdancexo.mp3?rlkey=sdj816zi5n6n1tr2begydatx6",
+            "dj": "slowdancexo",
+            "date": "May 21, 2026",
+            "duration": "1h 14m",
+            "durationSecs": 4447,
+            "youtube": "https://www.youtube.com/watch?v=yvmpLNpoYOs&t=6s",
+            "soundcloudLinks": [
+                  {
+                        "name": "slowdancexo",
+                        "url": "https://soundcloud.com/slowdancexo"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM94",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/7vy107bd66peucvw9htql/EVAMM94_DSD.mp3?rlkey=u4sxhttfuz9t2yeiw795y4rd7",
+            "dj": "DSD",
+            "date": "May 21, 2026",
+            "duration": "1h 5m",
+            "durationSecs": 3910,
+            "youtube": "https://www.youtube.com/watch?v=cfU7yuHnpjI&pp=0gcJCUELAYcqIYzv",
+            "soundcloudLinks": [
+                  {
+                        "name": "DSD",
+                        "url": "https://www.instagram.com/thefakefuture/"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM95",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/c8uzn7cn0pm5ylt8vzbz4/EVAMM95_EvaMyraMay.mp3?rlkey=fgvmog725zkmave69ygk8xv7c",
+            "dj": "Eva Myra May",
+            "date": "Jun 4, 2026",
+            "duration": "1h 3m",
+            "durationSecs": 3782,
+            "youtube": "https://www.youtube.com/watch?v=2UzA15_SxTg&t=689s&pp=0gcJCUELAYcqIYzv",
+            "soundcloudLinks": [
+                  {
+                        "name": "Eva Myra May",
+                        "url": "https://soundcloud.com/evamyramay"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM96",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/ni8re39zwz27ipzoz046m/EVAMM96_JoshPeace_DJKMS.mp3?rlkey=884em0umtfymncn2rk0fiuxad",
+            "dj": "Josh Peace & DJKMS",
+            "date": "Jun 10, 2026",
+            "duration": "52m",
+            "durationSecs": 3174,
+            "youtube": "https://www.youtube.com/watch?v=zxTXAYB_nx4",
+            "soundcloudLinks": [
+                  {
+                        "name": "Josh Peace",
+                        "url": "https://soundcloud.com/djjoshpeace"
+                  },
+                  {
+                        "name": "DJKMS",
+                        "url": "https://soundcloud.com/kms1999"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM97",
+            "src": "https://dl.dropboxusercontent.com/scl/fi/rc8bskm3tjlqgdnxjbylr/EVAMM97_s-verine.mp3?rlkey=44k0lhy1r8xh2j3qh9z3b3vat",
+            "dj": "séverine",
+            "date": "Jun 10, 2026",
+            "duration": "1h 10m",
+            "durationSecs": 4208,
+            "youtube": "https://www.youtube.com/watch?v=sEDDVsoRrgU&t=1173s",
+            "soundcloudLinks": [
+                  {
+                        "name": "séverine",
+                        "url": "https://soundcloud.com/s3v3r1n333"
+                  }
+            ]
+      },
+      {
+            "ep": "EVAMM98",
+            "src": "EVAMM_Season1_AudioFiles/EVAMM98_samRAW.mp3",
+            "dj": "sam RAW",
+            "date": "Jun 10, 2026",
+            "duration": "1h 10m",
+            "durationSecs": 4208,
+            "youtube": "",
+            "soundcloudLinks": [
+                  {
+                        "name": "sam RAW",
+                        "url": "https://www.instagram.com/instagram_sam666/"
+                  }
+            ]
+      }
+];
+
+    const TOTAL_SECS    = 426374;
+    const START_OFFSET  = 300175;
+    const BROADCAST_START = 1781302725;
+
+    function getBroadcastPosition() {
+      const nowSecs = Math.floor(Date.now() / 1000);
+      return (START_OFFSET + (nowSecs - BROADCAST_START)) % TOTAL_SECS;
+    }
+
+    function findEpisodeAtPosition(pos) {
+      let elapsed = 0;
+      for (let i = 0; i < episodes.length; i++) {
+        if (pos < elapsed + episodes[i].durationSecs) {
+          return { index: i, seekTo: pos - elapsed };
+        }
+        elapsed += episodes[i].durationSecs;
+      }
+      return { index: 0, seekTo: 0 };
+    }
+
+
+    const YT_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" style="fill:currentColor;vertical-align:middle;margin-right:5px;position:relative;top:-1px;"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>`;
+    const SC_ICON  = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" style="fill:currentColor;vertical-align:middle;margin-right:5px;position:relative;top:-1px;"><path d="M1.175 12.225c-.067 0-.12.045-.13.111l-.233 2.154.233 2.105c.01.066.063.111.13.111.066 0 .12-.045.13-.112l.264-2.104-.264-2.154c-.01-.066-.064-.111-.13-.111zm1.516-.24c-.08 0-.144.053-.155.131l-.2 2.263.2 2.199c.011.078.075.131.155.131.079 0 .143-.053.154-.131l.227-2.199-.227-2.263c-.011-.078-.075-.131-.154-.131zm1.531-.1c-.094 0-.17.063-.182.155l-.172 2.338.172 2.263c.012.092.088.155.182.155.093 0 .169-.063.181-.155l.196-2.263-.196-2.338c-.012-.092-.088-.155-.181-.155zm1.543.024c-.107 0-.194.072-.207.176l-.145 2.313.145 2.275c.013.104.1.176.207.176.106 0 .193-.072.206-.176l.165-2.275-.165-2.313c-.013-.104-.1-.176-.206-.176zm1.557-.1c-.12 0-.219.082-.232.199l-.118 2.39.118 2.321c.013.117.112.199.232.199.119 0 .218-.082.231-.199l.134-2.321-.134-2.39c-.013-.117-.112-.199-.231-.199zm1.571-.13c-.133 0-.243.093-.257.223l-.09 2.496.09 2.374c.014.13.124.223.257.223.132 0 .242-.093.256-.223l.103-2.374-.103-2.496c-.014-.13-.124-.223-.256-.223zm1.586.01c-.146 0-.267.104-.282.247l-.063 2.486.063 2.413c.015.143.136.247.282.247.145 0 .266-.104.281-.247l.072-2.413-.072-2.486c-.015-.143-.136-.247-.281-.247zm1.6-.2c-.16 0-.291.116-.307.272l-.035 2.686.035 2.452c.016.156.147.272.307.272.159 0 .29-.116.306-.272l.04-2.452-.04-2.686c-.016-.156-.147-.272-.306-.272zM15.5 8.103c-.324 0-.633.06-.918.169C14.215 5.326 11.763 3 8.773 3 7.7 3 6.7 3.32 5.875 3.876v12.574h9.625C17.434 16.45 19 14.884 19 12.95 19 10.342 17.434 8.103 15.5 8.103z"/></svg>`;
+
+    let currentIndex = 0;
+    let playing = false;
+    let countdownInterval = null;
+    let episodeEndTimestamp = null;
+
+    function pad(n) { return String(Math.floor(n)).padStart(2, '0'); }
+
+    function startCountdown(remainingSecs) {
+      episodeEndTimestamp = Date.now() + remainingSecs * 1000;
+      clearInterval(countdownInterval);
+      const el = document.getElementById('episodeCountdown');
+      countdownInterval = setInterval(() => {
+        const remaining = Math.max(0, (episodeEndTimestamp - Date.now()) / 1000);
+        const h = Math.floor(remaining / 3600);
+        const m = Math.floor((remaining % 3600) / 60);
+        const s = Math.floor(remaining % 60);
+        el.textContent = `Next Set Starts in ${pad(h)}:${pad(m)}:${pad(s)}`;
+      }, 1000);
+    }
+
+    const btn       = document.getElementById('playBtn');
+    const audio     = document.getElementById('audio');
+    const playIcon  = document.getElementById('playIcon');
+    const stopIcon  = document.getElementById('stopIcon');
+    const infoPanel = document.getElementById('episodeInfo');
+
+    function updateInfo(ep) {
+      infoPanel.classList.remove('visible');
+      setTimeout(() => {
+        document.getElementById('episodeID').textContent    = ep.ep;
+        document.getElementById('episodeDJ').textContent   = ep.dj;
+        document.getElementById('episodeDate').textContent = ep.date ? 'Recorded ' + ep.date : '';
+        const linksEl = document.getElementById('episodeLinks');
+        linksEl.innerHTML = '';
+        if (ep.youtube) {
+          const a = document.createElement('a');
+          a.href = ep.youtube; a.target = '_blank'; a.rel = 'noopener';
+          a.innerHTML = YT_ICON + 'Watch Video of This Episode';
+          linksEl.appendChild(a);
+        }
+        ep.soundcloudLinks.forEach(sc => {
+          const a = document.createElement('a');
+          a.href = sc.url; a.target = '_blank'; a.rel = 'noopener';
+          a.innerHTML = SC_ICON + 'More from ' + sc.name;
+          linksEl.appendChild(a);
+        });
+        infoPanel.classList.add('visible');
+      }, 1500);
+    }
+
+    function playEpisode(index, seekTo) {
+      const ep = episodes[index];
+      currentIndex = index;
+      const remainingSecs = ep.durationSecs - (seekTo || 0);
+      startCountdown(remainingSecs);
+      audio.src = ep.src;
+      audio.load();
+      if (seekTo) {
+        audio.addEventListener('canplay', () => { audio.currentTime = seekTo; }, { once: true });
+      }
+      audio.play().catch(() => {});
+      updateInfo(ep);
+    }
+
+    audio.addEventListener('ended', () => {
+      playEpisode((currentIndex + 1) % episodes.length);
+    });
+
+    let episodeLoaded = false;
+
+    btn.addEventListener('click', () => {
+      if (!playing) {
+        playing = true;
+        playIcon.style.display = 'none';
+        stopIcon.style.display = 'block';
+        btn.setAttribute('aria-label', 'Stop');
+        if (!episodeLoaded) {
+          // First play — calculate broadcast position and load episode
+          const { index, seekTo } = findEpisodeAtPosition(getBroadcastPosition());
+          episodeLoaded = true;
+          playEpisode(index, seekTo);
+        } else {
+          // Resume — just play, countdown already ticking in real time
+          audio.play().catch(() => {});
+        }
+      } else {
+        playing = false;
+        audio.pause();
+        // Countdown keeps ticking in real time even while paused
+        playIcon.style.display = 'block';
+        stopIcon.style.display = 'none';
+        btn.setAttribute('aria-label', 'Play');
+      }
+    });
+  </script>
+
+</body>
+</html>
