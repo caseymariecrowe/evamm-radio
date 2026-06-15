@@ -169,6 +169,45 @@
     }
     .episode-links a:hover { color: #aaa; border-color: #aaa; }
     audio { display: none; }
+    #twitch-section {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 48px;
+      width: 100%;
+      max-width: 720px;
+      padding: 0 24px;
+    }
+    #twitch-section.live {
+      display: flex;
+    }
+    #twitch-embed {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+    }
+    #twitch-embed iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .twitch-live-label {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #9147ff;
+      margin-bottom: 12px;
+    }
+    .twitch-past-link {
+      margin-top: 16px;
+      font-size: 8px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #fff;
+      text-decoration: none;
+      border-bottom: 1px solid #444;
+      padding-bottom: 2px;
+    }
+    .twitch-past-link:hover { color: #aaa; border-color: #aaa; }
   </style>
 </head>
 <body>
@@ -179,6 +218,13 @@
   <div class="season-title">Season 1</div>
   <div class="season-years">2023 – 2026</div>
 
+  <div id="twitch-section">
+    <div class="twitch-live-label">● Live Now</div>
+    <div id="twitch-embed"></div>
+    <a class="twitch-past-link" href="https://www.youtube.com/channel/UCP-0piJMPJJMogPy9zdFCzQ" target="_blank" rel="noopener">For past episodes click here</a>
+  </div>
+
+  <div id="radio-player-section">
   <div class="player">
     <button class="play-btn" id="playBtn" aria-label="Play">
       <svg id="playIcon" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg>
@@ -263,7 +309,10 @@
       <a href="https://soundcloud.com/yourmuther" target="_blank" rel="noopener">Your Muther</a>
       <a href="https://soundcloud.com/zivirecords" target="_blank" rel="noopener">Zivi</a>
     </div>
-    <div class="social">
+  </div>
+  </div>
+
+  <div class="social">
       <div class="social-header">More from EVAMM Radio</div>
       <div class="social-links">
         <a href="https://www.instagram.com/evammradio/" target="_blank" rel="noopener">
@@ -1948,6 +1997,30 @@
         stopIcon.style.display = 'none';
         btn.setAttribute('aria-label', 'Play');
       }
+    });
+  </script>
+
+  <script src="https://embed.twitch.tv/embed/v1.js"></script>
+  <script>
+    const twitchSection = document.getElementById('twitch-section');
+    const radioPlayerSection = document.getElementById('radio-player-section');
+
+    const twitchEmbed = new Twitch.Embed('twitch-embed', {
+      channel: 'evammradio',
+      parent: ['evammradio.com', 'localhost'],
+      layout: 'video',
+      autoplay: true,
+      muted: false
+    });
+
+    twitchEmbed.addEventListener(Twitch.Embed.ONLINE, () => {
+      twitchSection.classList.add('live');
+      radioPlayerSection.style.display = 'none';
+    });
+
+    twitchEmbed.addEventListener(Twitch.Embed.OFFLINE, () => {
+      twitchSection.classList.remove('live');
+      radioPlayerSection.style.display = '';
     });
   </script>
 
