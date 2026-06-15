@@ -106,9 +106,55 @@
       font-size: 11px;
       cursor: default;
     }
+    .episode-list {
+      max-width: 560px;
+      margin: 32px auto 0;
+      padding: 0 24px;
+    }
+    .archive-toggle {
+      font-size: 11px;
+      letter-spacing: 0;
+      text-transform: none;
+      color: #666;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .archive-toggle:hover { color: #fff; }
+    .archive-toggle svg {
+      width: 10px;
+      height: 10px;
+      fill: currentColor;
+      transition: transform 0.2s ease;
+    }
+    .archive-toggle.open svg {
+      transform: rotate(180deg);
+    }
+    .episode-list-items {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .episode-list-items a {
+      color: #666;
+      font-size: 11px;
+      text-decoration: none;
+    }
+    .episode-list-items a:hover {
+      color: #fff;
+    }
+    .episode-list-items .no-link {
+      color: #444;
+      font-size: 11px;
+    }
     .social {
-      margin-top: 32px;
-      padding-bottom: 64px;
+      max-width: 560px;
+      width: 100%;
+      margin: 32px auto 0;
+      padding: 0 24px 64px;
     }
     .social-header {
       font-size: 10px;
@@ -286,7 +332,7 @@
       <a href="https://soundcloud.com/linda_lo" target="_blank" rel="noopener">Linda Lo</a>
       <a href="https://soundcloud.com/prettygayfriendly/low-hanging-fruit-valentines" target="_blank" rel="noopener">Low Hanging Fruit</a>
       <a href="https://soundcloud.com/hi_mija" target="_blank" rel="noopener">Mija</a>
-      <a href="https://soundcloud.com/minin_la" target="_blank" rel="noopener">MININ</a>
+      <a href="https://soundcloud.com/minin_la" target="_blank" rel="noopener">MIÑIN</a>
       <a href="https://soundcloud.com/morelia" target="_blank" rel="noopener">Morelia</a>
       <a href="https://www.instagram.com/noisepup/" target="_blank" rel="noopener">Noisepup</a>
       <a href="https://soundcloud.com/videomo" target="_blank" rel="noopener">Omo</a>
@@ -309,6 +355,108 @@
       <a href="https://soundcloud.com/yourmuther" target="_blank" rel="noopener">Your Muther</a>
       <a href="https://soundcloud.com/zivirecords" target="_blank" rel="noopener">Zivi</a>
     </div>
+  </div>
+
+  <div class="episode-list">
+    <a class="archive-toggle" id="archiveToggle" href="#">Full Episode Archive <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></a>
+    <div class="episode-list-items" id="archiveList" style="display:none;">
+      <a href="https://www.youtube.com/watch?v=qIyS2iCBUc8" target="_blank" rel="noopener">EVAMM03 – <strong>Eva Myra May</strong> / 1h 31m</a>
+      <a href="https://www.youtube.com/watch?v=7cLAoHj3mgs&t=1936s" target="_blank" rel="noopener">EVAMM04 – <strong>Eva Myra May & DJBeats</strong> / 1h 4m</a>
+      <a href="https://www.youtube.com/watch?v=rHfdAjC_7aU&t=1558s" target="_blank" rel="noopener">EVAMM05 – <strong>gloworm & Eva Myra May</strong> / 1h 16m</a>
+      <a href="https://www.youtube.com/watch?v=SVls0A0keFE&t=1900s" target="_blank" rel="noopener">EVAMM06 – <strong>Eva Myra May & Ethical Drvgs</strong> / 1h 3m</a>
+      <a href="https://www.youtube.com/watch?v=EJjAPpQDDuY&t=2959s&pp=0gcJCUELAYcqIYzv" target="_blank" rel="noopener">EVAMM07 – <strong>Demon Time CEO & Eva Myra May</strong> / 1h</a>
+      <a href="https://www.youtube.com/watch?v=wp-CgPUvc2c&t=2983s" target="_blank" rel="noopener">EVAMM08 – <strong>Noisepup & Eva Myra May</strong> / 1h 3m</a>
+      <a href="https://www.youtube.com/watch?v=-Out9AkwFHE&t=2822s" target="_blank" rel="noopener">EVAMM09 – <strong>Mija & Bloody & Eva Myra May</strong> / 1h 5m</a>
+      <a href="https://www.youtube.com/watch?v=_4-zcU7Hga4&t=3388s" target="_blank" rel="noopener">EVAMM10 – <strong>Succubus & Infernx & Eva Myra May</strong> / 1h 1m</a>
+      <a href="https://www.youtube.com/watch?v=2GgNenefx0I&t=1833s" target="_blank" rel="noopener">EVAMM11 – <strong>Eva Myra May & Mija</strong> / 52m</a>
+      <a href="https://www.youtube.com/watch?v=4TBx3jxjSVc&t=1217s" target="_blank" rel="noopener">EVAMM12 – <strong>Ethical Drvgs & Eva Myra May</strong> / 1h 3m</a>
+      <a href="https://www.youtube.com/watch?v=9uffucUYVys&t=20s" target="_blank" rel="noopener">EVAMM13 – <strong>Eva Myra May</strong> / 1h 1m</a>
+      <a href="https://www.youtube.com/watch?v=jRxPKnAUxJs&t=4s&pp=0gcJCUELAYcqIYzv" target="_blank" rel="noopener">EVAMM14 – <strong>Eva Myra May</strong> / 1h 12m</a>
+      <a href="https://www.youtube.com/watch?v=9tmhM-52uXo&t=5769s" target="_blank" rel="noopener">EVAMM15 – <strong>Eva Myra May</strong> / 1h 45m</a>
+      <a href="https://www.youtube.com/watch?v=v1B069X94b0&t=2847s" target="_blank" rel="noopener">EVAMM16 – <strong>Eric Lodwick</strong> / 2h 8m</a>
+      <a href="https://www.youtube.com/watch?v=25MC793foJM&t=3003s&pp=0gcJCUELAYcqIYzv" target="_blank" rel="noopener">EVAMM17 – <strong>Eva Myra May & Jacob Grosse</strong> / 1h 2m</a>
+      <a href="https://www.youtube.com/watch?v=JxzL7AwYeMY&t=1074s" target="_blank" rel="noopener">EVAMM18 – <strong>Eva Myra May</strong> / 1h 2m</a>
+      <a href="https://www.youtube.com/watch?v=MaIUfFlTS4Y&t=1836s" target="_blank" rel="noopener">EVAMM19 – <strong>Ethical Drvgs & Eva Myra May</strong> / 1h 3m</a>
+      <a href="https://www.youtube.com/watch?v=aGYnaJ6VBUo&t=5587s" target="_blank" rel="noopener">EVAMM20 – <strong>coldsweat & Morelia & Eva Myra May</strong> / 1h 47m</a>
+      <a href="https://www.youtube.com/watch?v=DKUwJdjPznE&t=2659s" target="_blank" rel="noopener">EVAMM21 – <strong>Kitty Logic & Eva Myra May</strong> / 1h 1m</a>
+      <a href="https://www.youtube.com/watch?v=mwXLdyhUXFs&t=1136s" target="_blank" rel="noopener">EVAMM22 – <strong>coldsweat & Eva Myra May</strong> / 1h 47m</a>
+      <a href="https://www.youtube.com/watch?v=srF-qPLsttg&t=1492s" target="_blank" rel="noopener">EVAMM23 – <strong>Vega Delanova</strong> / 45m</a>
+      <a href="https://www.youtube.com/watch?v=W687DttGjr8&t=1454s" target="_blank" rel="noopener">EVAMM24 – <strong>tsGO!</strong> / 1h 4m</a>
+      <a href="https://www.youtube.com/watch?v=fMiDqg2vsAI&t=24s" target="_blank" rel="noopener">EVAMM25 – <strong>Zivi</strong> / 1h</a>
+      <a href="https://www.youtube.com/watch?v=aean2L65RDY&t=3297s&pp=0gcJCUELAYcqIYzv" target="_blank" rel="noopener">EVAMM26 – <strong>Jacob Grosse & heelbite316</strong> / 2h 33m</a>
+      <a href="https://www.youtube.com/watch?v=43TAn6vmzgw&t=77s" target="_blank" rel="noopener">EVMM27 – <strong>Morelia & Pixie Dust</strong> / 1h 3m</a>
+      <a href="https://www.youtube.com/watch?v=qguzhAd6zDg&t=19s" target="_blank" rel="noopener">EVAMM28 – <strong>coldsweat</strong> / 1h 30m</a>
+      <a href="https://www.youtube.com/watch?v=KWtDsN1sfuk&t=283s" target="_blank" rel="noopener">EVAMM29 – <strong>gloworm</strong> / 1h 1m</a>
+      <a href="https://www.youtube.com/watch?v=b7UrFi_5JTE&t=242s" target="_blank" rel="noopener">EVAMM30 – <strong>Eva Myra May</strong> / 1h 11m</a>
+      <a href="https://www.youtube.com/watch?v=puczZbY2G00&pp=0gcJCUELAYcqIYzv" target="_blank" rel="noopener">EVAMM31 – <strong>Eva Myra May</strong> / 1h</a>
+      <a href="https://www.youtube.com/watch?v=T5EyUlyfLxM&t=42s" target="_blank" rel="noopener">EVAMM33 – <strong>bibidiscoteca</strong> / 1h 1m</a>
+      <a href="https://www.youtube.com/watch?v=PNccreimkKY&t=1540s" target="_blank" rel="noopener">EVAMM34 – <strong>Ethical Drvgs & Linda Lo</strong> / 48m</a>
+      <a href="https://www.youtube.com/watch?v=clbzTGZxWO8&t=3473s" target="_blank" rel="noopener">EVAMM35 – <strong>tsGO!</strong> / 1h 8m</a>
+      <a href="https://www.youtube.com/watch?v=pNtRXz85ZPI&t=45s" target="_blank" rel="noopener">EVAMM36 – <strong>androcided & webmistress</strong> / 1h 3m</a>
+      <a href="https://www.youtube.com/watch?v=bRyw9oE0Iro&t=2s" target="_blank" rel="noopener">EVAMM37 – <strong>Ethical Drvgs</strong> / 1h 13m</a>
+      <a href="https://www.youtube.com/watch?v=x14I-PJP9FI&t=3403s" target="_blank" rel="noopener">EVAMM38 – <strong>gloworm</strong> / 1h 4m</a>
+      <a href="https://www.youtube.com/watch?v=a5fjhPhyI6A&t=1s" target="_blank" rel="noopener">EVAMM39 – <strong>teamjacob0</strong> / 45m</a>
+      <a href="https://www.youtube.com/watch?v=lA5NYyq-Bps&t=260s" target="_blank" rel="noopener">EVAMM40 – <strong>Eva Myra May</strong> / 1h 4m</a>
+      <a href="https://www.youtube.com/watch?v=CdiAmurAJiM&t=31s" target="_blank" rel="noopener">EVAMM41 – <strong>Ashley Anngora</strong> / 55m</a>
+      <span style="color:#666;font-size:11px;cursor:default;">EVAMM42 – <strong>Desa Deca</strong> / 1h 6m</span>
+      <a href="https://www.youtube.com/watch?v=eS5vY62I1d0&t=31s" target="_blank" rel="noopener">EVAMM43 – <strong>Eva Myra May</strong> / 59m</a>
+      <a href="https://www.youtube.com/watch?v=QnzDBW3Wz6I&t=2671s" target="_blank" rel="noopener">EVAMM44 – <strong>Innerkid</strong> / 48m</a>
+      <a href="https://www.youtube.com/watch?v=qWaXNDZuk0M&t=4s" target="_blank" rel="noopener">EVAMM45 – <strong>DIZI</strong> / 1h 9m</a>
+      <a href="https://www.youtube.com/watch?v=nDFuNVbe5kU&t=2088s&pp=0gcJCUELAYcqIYzv" target="_blank" rel="noopener">EVAMM46 – <strong>Jacob Grosse</strong> / 1h 1m</a>
+      <a href="https://www.youtube.com/watch?v=CCA3Nf8RiU0&t=1s" target="_blank" rel="noopener">EVAMM47 – <strong>coldsweat</strong> / 1h 2m</a>
+      <a href="https://www.youtube.com/watch?v=zFKNIAIT65Q&t=1264s" target="_blank" rel="noopener">EVAMM48 – <strong>hardbopnymph</strong> / 1h 7m</a>
+      <a href="https://www.youtube.com/watch?v=_uUks9r56lQ&t=2199s" target="_blank" rel="noopener">EVAMM49 – <strong>f1shifty & Eva Myra May</strong> / 1h 6m</a>
+      <a href="https://www.youtube.com/watch?v=r5Yc7vk77c4&t=3270s&pp=0gcJCUELAYcqIYzv" target="_blank" rel="noopener">EVAMM50 – <strong>Eva Myra May</strong> / 1h 12m</a>
+      <a href="https://www.youtube.com/watch?v=v3oc7YMfBeo&t=2397s" target="_blank" rel="noopener">EVAMM51 – <strong>Eva Myra May</strong> / 1h 8m</a>
+      <a href="https://www.youtube.com/watch?v=I5Rz2wtQDLQ&t=1s" target="_blank" rel="noopener">EVAMM52 – <strong>allmyoppsare10s</strong> / 1h 41m</a>
+      <a href="https://www.youtube.com/watch?v=LmtD9g7ZAGw&t=1426s" target="_blank" rel="noopener">EVAMM53 – <strong>Pretty Gay Friendly & Eva Myra May</strong> / 1h 12m</a>
+      <a href="https://www.youtube.com/watch?v=t5crHVeleTU&t=2538s" target="_blank" rel="noopener">EVAMM54 – <strong>pinche</strong> / 1h 4m</a>
+      <a href="https://www.youtube.com/watch?v=XliZEtwNkKo&t=32s" target="_blank" rel="noopener">EVAMM55 – <strong>weepingwillowtree</strong> / 1h 10m</a>
+      <a href="https://www.youtube.com/watch?v=UfjwR6dgAEA&t=45s" target="_blank" rel="noopener">EVAMM56 – <strong>Your Muther</strong> / 49m</a>
+      <a href="https://www.youtube.com/watch?v=f48sF3Lo1-E&t=4253s" target="_blank" rel="noopener">EVAMM57a – <strong>Josh Peace</strong> / 1h 14m</a>
+      <a href="https://www.youtube.com/watch?v=oMsQn-RTKT0&t=11s" target="_blank" rel="noopener">EVAMM57b – <strong>tsGO!</strong> / 1h 5m</a>
+      <a href="https://www.youtube.com/watch?v=9DseBQ6rPF8&t=31s" target="_blank" rel="noopener">EVAMM58 – <strong>Maxim ESL</strong> / 47m</a>
+      <a href="https://www.youtube.com/watch?v=WTiDEyIi65w&t=862s" target="_blank" rel="noopener">EVAMM59 – <strong>Linda Lo</strong> / 1h 4m</a>
+      <a href="https://www.youtube.com/watch?v=JQkq0NbtZ2E&t=1491s" target="_blank" rel="noopener">EVAMM60 – <strong>WADOOD</strong> / 1h 7m</a>
+      <a href="https://www.youtube.com/watch?v=0e61npRsyfk&t=6067s" target="_blank" rel="noopener">EVAMM61 – <strong>Maxim ESL & tsGO!</strong> / 1h 57m</a>
+      <a href="https://www.youtube.com/watch?v=0kulQK_OLyU&t=586s" target="_blank" rel="noopener">EVAMM62 – <strong>Barto</strong> / 1h 19m</a>
+      <a href="https://www.youtube.com/watch?v=1JtY_BYwHL4&t=28s" target="_blank" rel="noopener">EVAMM63 – <strong>Omo</strong> / 1h 7m</a>
+      <a href="https://www.youtube.com/watch?v=rseO7eR-OlY&t=2s" target="_blank" rel="noopener">EVAMM64 – <strong>Beeflounge</strong> / 54m</a>
+      <a href="https://www.youtube.com/watch?v=i9nbI6vT9_I&t=1192s" target="_blank" rel="noopener">EVAMM65 – <strong>coldsweat</strong> / 1h 5m</a>
+      <a href="https://www.youtube.com/watch?v=Hv3_5iFsSfA&t=8975s" target="_blank" rel="noopener">EVAMM66 – <strong>Linda Lo & Pollensource & Eva Myra May & Cister</strong> / 3h 43m</a>
+      <a href="https://www.youtube.com/watch?v=QhsBFXDUBr0&t=466s" target="_blank" rel="noopener">EVAMM67 – <strong>Eva Myra May</strong> / 1h 3m</a>
+      <a href="https://www.youtube.com/watch?v=QcbINKthqk8&t=13s" target="_blank" rel="noopener">EVAMM68 – <strong>Ethical Drvgs</strong> / 1h 31m</a>
+      <a href="https://www.youtube.com/watch?v=U8GKhtmkegg&t=5782s" target="_blank" rel="noopener">EVAMM69 – <strong>Worm Food Remix Release Party</strong> / 4h 28m</a>
+      <a href="https://www.youtube.com/watch?v=r9f9HsL-VEw&t=1634s" target="_blank" rel="noopener">EVAMM70 – <strong>Eva Myra May</strong> / 2h 10m</a>
+      <a href="https://www.youtube.com/watch?v=uDaoeNZw4SY&t=832s" target="_blank" rel="noopener">EVAMM71 – <strong>Maxim ESL & Eva Myra May</strong> / 1h 29m</a>
+      <a href="https://www.youtube.com/watch?v=74hTXUnDBg0&t=25s" target="_blank" rel="noopener">EVAMM72 – <strong>Privacy Settings</strong> / 59m</a>
+      <a href="https://www.youtube.com/watch?v=NfuXyZO_8S8&t=1571s" target="_blank" rel="noopener">EVAMM73 – <strong>Low Hanging Fruit</strong> / 2h 6m</a>
+      <a href="https://www.youtube.com/watch?v=Mc8z9d8_nVI&t=557s" target="_blank" rel="noopener">EVAMM74 – <strong>Privacy Settings & Maxim ESL & Eva Myra May</strong> / 1h 3m</a>
+      <a href="https://www.youtube.com/watch?v=XH2IfK_hUP0&t=1954s" target="_blank" rel="noopener">EVAMM75 – <strong>Eva Myra May</strong> / 1h 13m</a>
+      <a href="https://www.youtube.com/watch?v=HIyfgFMS-z4&t=10s" target="_blank" rel="noopener">EVAMM76 – <strong>hardbopnymph</strong> / 1h 17m</a>
+      <a href="https://www.youtube.com/watch?v=36kBqlYJRx0&t=2677s" target="_blank" rel="noopener">EVAMM77 – <strong>Shana Sarett</strong> / 1h 13m</a>
+      <a href="https://www.youtube.com/watch?v=mftlgvJPKSk&t=3901s" target="_blank" rel="noopener">EVAMM78 – <strong>Baby Weight</strong> / 1h 22m</a>
+      <a href="https://www.youtube.com/watch?v=AydeKNN3x4E&t=4s" target="_blank" rel="noopener">EVAMM79 – <strong>Succubus</strong> / 1h</a>
+      <a href="https://www.youtube.com/watch?v=FYhuVc44jpw&t=1201s" target="_blank" rel="noopener">EVAMM80 – <strong>Eva Myra May</strong> / 59m</a>
+      <a href="https://www.youtube.com/watch?v=4Wvd-prc-V0&t=44s" target="_blank" rel="noopener">EVAMM81 – <strong>Eva Myra May</strong> / 1h</a>
+      <a href="https://www.youtube.com/watch?v=OqsUZV6CTRY&t=37s" target="_blank" rel="noopener">EVAMM82 – <strong>allmyoppsare10s</strong> / 1h 44m</a>
+      <a href="https://www.youtube.com/watch?v=G3Y3La_fG1o&t=30s" target="_blank" rel="noopener">EVAMM83 – <strong>Josh Peace</strong> / 1h 5m</a>
+      <a href="https://www.youtube.com/watch?v=k67qZJAwNhg&t=42s" target="_blank" rel="noopener">EVAMM84 – <strong>Your Muther</strong> / 46m</a>
+      <a href="https://www.youtube.com/watch?v=YJOKXr_Sp7U&t=14s" target="_blank" rel="noopener">EVAMM85 – <strong>Eva Myra May</strong> / 54m</a>
+      <a href="https://www.youtube.com/watch?v=cxEwR4VyUCc&t=8s" target="_blank" rel="noopener">EVAMM86 – <strong>Lily Ardalan</strong> / 1h 5m</a>
+      <a href="https://www.youtube.com/watch?v=NGKkou8L7MQ&t=2473s" target="_blank" rel="noopener">EVAMM87 – <strong>5p3c141</strong> / 1h 1m</a>
+      <a href="https://www.youtube.com/watch?v=UCZPsbkASPE&t=1332s" target="_blank" rel="noopener">EVAMM88 – <strong>Seanathan</strong> / 1h 7m</a>
+      <a href="https://www.youtube.com/watch?v=Do6rYlLo6e0&t=3380s" target="_blank" rel="noopener">EVAMM89 – <strong>tsGO!</strong> / 1h 2m</a>
+      <a href="https://www.youtube.com/watch?v=FTPA8O1XbcE&t=2849s" target="_blank" rel="noopener">EVAMM90 – <strong>Linda Lo & Avi Loud</strong> / 1h 3m</a>
+      <a href="https://www.youtube.com/watch?v=bOzNjLsn1m0&t=761s" target="_blank" rel="noopener">EVAMM91 – <strong>Eva Myra May</strong> / 1h 1m</a>
+      <a href="https://www.youtube.com/watch?v=kV8xIfzyFLQ&t=1506s" target="_blank" rel="noopener">EVAMM92 – <strong>MIÑIN</strong> / 38m</a>
+      <a href="https://www.youtube.com/watch?v=yvmpLNpoYOs&t=6s" target="_blank" rel="noopener">EVAMM93 – <strong>slowdancexo</strong> / 1h 14m</a>
+      <a href="https://www.youtube.com/watch?v=cfU7yuHnpjI&pp=0gcJCUELAYcqIYzv" target="_blank" rel="noopener">EVAMM94 – <strong>DSD</strong> / 1h 5m</a>
+      <a href="https://www.youtube.com/watch?v=2UzA15_SxTg&t=689s&pp=0gcJCUELAYcqIYzv" target="_blank" rel="noopener">EVAMM95 – <strong>Eva Myra May</strong> / 1h 3m</a>
+      <a href="https://www.youtube.com/watch?v=zxTXAYB_nx4" target="_blank" rel="noopener">EVAMM96 – <strong>Josh Peace & DJ KMS</strong> / 52m</a>
+      <a href="https://www.youtube.com/watch?v=sEDDVsoRrgU&t=1173s" target="_blank" rel="noopener">EVAMM97 – <strong>séverine</strong> / 1h 10m</a>
+    </div>
+  </div>
   </div>
   </div>
 
@@ -1787,14 +1935,14 @@
       {
             "ep": "EVAMM92",
             "src": "https://dl.dropboxusercontent.com/scl/fi/hsj7r7mzu5q51zxy170ii/EVAMM92_MININ.mp3?rlkey=4tb5kxgcoy9vpzhxvqnkxiobv",
-            "dj": "MININ",
+            "dj": "MIÑIN",
             "date": "May 21, 2026",
             "duration": "38m",
             "durationSecs": 2298,
             "youtube": "https://www.youtube.com/watch?v=kV8xIfzyFLQ&t=1506s",
             "soundcloudLinks": [
                   {
-                        "name": "MININ",
+                        "name": "MIÑIN",
                         "url": "https://soundcloud.com/minin_la"
                   }
             ]
@@ -1997,6 +2145,17 @@
         stopIcon.style.display = 'none';
         btn.setAttribute('aria-label', 'Play');
       }
+    });
+  </script>
+
+  <script>
+    document.getElementById('archiveToggle').addEventListener('click', function(e) {
+      e.preventDefault();
+      const list = document.getElementById('archiveList');
+      const open = list.style.display === 'none';
+      list.style.display = open ? 'flex' : 'none';
+      this.classList.toggle('open', open);
+      this.innerHTML = (open ? 'Hide Episode Archive' : 'Full Episode Archive') + ' <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>';
     });
   </script>
 
