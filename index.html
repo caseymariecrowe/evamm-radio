@@ -314,7 +314,7 @@
       font-size: 10px;
       letter-spacing: 0.3em;
       text-transform: uppercase;
-      color: #9147ff;
+      color: #ff2a2a;
       margin-bottom: 12px;
     }
     .twitch-past-link {
@@ -341,7 +341,7 @@
   <div id="twitch-section">
     <div class="twitch-live-label">● Live Now</div>
     <div id="twitch-embed"></div>
-    <a class="twitch-past-link" href="https://www.youtube.com/channel/UCP-0piJMPJJMogPy9zdFCzQ" target="_blank" rel="noopener">For past episodes click here</a>
+    <a class="twitch-past-link" href="/?s1">For past episodes click here</a>
   </div>
 
   <div id="radio-player-section">
@@ -2251,38 +2251,48 @@
 
   <script src="https://embed.twitch.tv/embed/v1.js"></script>
   <script>
-    const twitchSection = document.getElementById('twitch-section');
-    const radioPlayerSection = document.getElementById('radio-player-section');
+    const s1Mode = new URLSearchParams(window.location.search).has('s1');
 
-    const twitchEmbed = new Twitch.Embed('twitch-embed', {
-      channel: 'evammradio',
-      parent: ['evammradio.com', 'localhost'],
-      layout: 'video',
-      autoplay: true,
-      muted: false
-    });
+    if (!s1Mode) {
+      const twitchSection = document.getElementById('twitch-section');
+      const radioPlayerSection = document.getElementById('radio-player-section');
+      const seasonTitle = document.querySelector('.season-title');
+      const seasonYears = document.querySelector('.season-years');
 
-    twitchEmbed.addEventListener(Twitch.Embed.ONLINE, () => {
-      twitchSection.classList.add('live');
-      radioPlayerSection.style.display = 'none';
-      // Stop the season 1 player if it's running
-      if (typeof playing !== 'undefined' && playing) {
-        playing = false;
-        const _audio = document.getElementById('audio');
-        const _playIcon = document.getElementById('playIcon');
-        const _stopIcon = document.getElementById('stopIcon');
-        const _btn = document.getElementById('playBtn');
-        if (_audio) _audio.pause();
-        if (_playIcon) _playIcon.style.display = 'block';
-        if (_stopIcon) _stopIcon.style.display = 'none';
-        if (_btn) _btn.setAttribute('aria-label', 'Play');
-      }
-    });
+      const twitchEmbed = new Twitch.Embed('twitch-embed', {
+        channel: 'evammradio',
+        parent: ['evammradio.com', 'localhost'],
+        layout: 'video',
+        autoplay: true,
+        muted: false
+      });
 
-    twitchEmbed.addEventListener(Twitch.Embed.OFFLINE, () => {
-      twitchSection.classList.remove('live');
-      radioPlayerSection.style.display = '';
-    });
+      twitchEmbed.addEventListener(Twitch.Embed.ONLINE, () => {
+        twitchSection.classList.add('live');
+        radioPlayerSection.style.display = 'none';
+        seasonTitle.style.display = 'none';
+        seasonYears.style.display = 'none';
+        // Stop the season 1 player if it's running
+        if (typeof playing !== 'undefined' && playing) {
+          playing = false;
+          const _audio = document.getElementById('audio');
+          const _playIcon = document.getElementById('playIcon');
+          const _stopIcon = document.getElementById('stopIcon');
+          const _btn = document.getElementById('playBtn');
+          if (_audio) _audio.pause();
+          if (_playIcon) _playIcon.style.display = 'block';
+          if (_stopIcon) _stopIcon.style.display = 'none';
+          if (_btn) _btn.setAttribute('aria-label', 'Play');
+        }
+      });
+
+      twitchEmbed.addEventListener(Twitch.Embed.OFFLINE, () => {
+        twitchSection.classList.remove('live');
+        radioPlayerSection.style.display = '';
+        seasonTitle.style.display = '';
+        seasonYears.style.display = '';
+      });
+    }
   </script>
 
 </body>
