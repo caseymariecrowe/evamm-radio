@@ -37,6 +37,58 @@
       flex-direction: column;
       align-items: center;
       gap: 24px;
+      position: relative;
+    }
+    #glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 190px;
+      height: 190px;
+      background: radial-gradient(circle, rgba(180, 80, 255, 0.5) 0%, transparent 68%);
+      filter: blur(18px);
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      transition: opacity 2.5s ease;
+    }
+    #glow2 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(255, 80, 160, 0.3) 0%, transparent 65%);
+      filter: blur(22px);
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      transition: opacity 2.5s ease;
+    }
+    #glow.playing {
+      opacity: 1;
+      animation: glowMorph 22s ease-in-out infinite alternate;
+    }
+    #glow2.playing {
+      opacity: 1;
+      animation: glowMorph2 17s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes glowMorph {
+      0%   { border-radius: 60% 40% 55% 45% / 50% 60% 40% 50%; transform: translate(-51%, -49%) scale(0.88) rotate(0deg);  filter: blur(16px) hue-rotate(0deg); }
+      15%  { border-radius: 30% 70% 40% 60% / 70% 30% 60% 40%; transform: translate(-49%, -52%) scale(1.15) rotate(12deg); filter: blur(24px) hue-rotate(8deg); }
+      30%  { border-radius: 70% 30% 60% 40% / 35% 65% 45% 55%; transform: translate(-52%, -48%) scale(0.82) rotate(22deg); filter: blur(14px) hue-rotate(18deg); }
+      45%  { border-radius: 40% 60% 30% 70% / 60% 40% 70% 30%; transform: translate(-48%, -51%) scale(1.18) rotate(8deg);  filter: blur(26px) hue-rotate(28deg); }
+      60%  { border-radius: 55% 45% 75% 25% / 40% 60% 30% 70%; transform: translate(-51%, -50%) scale(0.9)  rotate(30deg); filter: blur(18px) hue-rotate(38deg); }
+      75%  { border-radius: 25% 75% 50% 50% / 55% 45% 65% 35%; transform: translate(-49%, -53%) scale(1.1)  rotate(18deg); filter: blur(22px) hue-rotate(46deg); }
+      90%  { border-radius: 65% 35% 35% 65% / 45% 55% 40% 60%; transform: translate(-50%, -47%) scale(0.93) rotate(5deg);  filter: blur(15px) hue-rotate(50deg); }
+      100% { border-radius: 60% 40% 55% 45% / 50% 60% 40% 50%; transform: translate(-51%, -49%) scale(0.88) rotate(0deg);  filter: blur(16px) hue-rotate(55deg); }
+    }
+    @keyframes glowMorph2 {
+      0%   { border-radius: 45% 55% 65% 35% / 60% 40% 50% 50%; transform: translate(-49%, -51%) scale(1.05) rotate(0deg);   filter: blur(20px) hue-rotate(0deg); }
+      25%  { border-radius: 70% 30% 40% 60% / 35% 65% 55% 45%; transform: translate(-51%, -48%) scale(0.82) rotate(-15deg); filter: blur(28px) hue-rotate(15deg); }
+      50%  { border-radius: 35% 65% 55% 45% / 65% 35% 40% 60%; transform: translate(-48%, -52%) scale(1.2)  rotate(-8deg);  filter: blur(16px) hue-rotate(35deg); }
+      75%  { border-radius: 60% 40% 30% 70% / 45% 55% 70% 30%; transform: translate(-52%, -50%) scale(0.88) rotate(-20deg); filter: blur(24px) hue-rotate(50deg); }
+      100% { border-radius: 45% 55% 65% 35% / 60% 40% 50% 50%; transform: translate(-49%, -51%) scale(1.05) rotate(0deg);   filter: blur(20px) hue-rotate(55deg); }
     }
     .play-btn {
       width: 64px; height: 64px;
@@ -281,6 +333,8 @@
 
   <div id="radio-player-section">
   <div class="player">
+    <div id="glow"></div>
+    <div id="glow2"></div>
     <button class="play-btn" id="playBtn" aria-label="Play">
       <svg id="playIcon" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg>
       <svg id="stopIcon" viewBox="0 0 24 24" style="display:none;"><rect x="5" y="5" width="14" height="14" rx="1"/></svg>
@@ -2086,6 +2140,9 @@
     const playIcon  = document.getElementById('playIcon');
     const stopIcon  = document.getElementById('stopIcon');
     const infoPanel = document.getElementById('episodeInfo');
+    const glow      = document.getElementById('glow');
+    const glow2     = document.getElementById('glow2');
+    let glowFadeTimeout = null;
 
     function updateInfo(ep) {
       infoPanel.classList.remove('visible');
@@ -2113,6 +2170,7 @@
 
     function playEpisode(index, seekTo) {
       const ep = episodes[index];
+      const episodeChanged = index !== currentIndex;
       currentIndex = index;
       const remainingSecs = ep.durationSecs - (seekTo || 0);
       startCountdown(remainingSecs);
@@ -2122,7 +2180,9 @@
         audio.addEventListener('canplay', () => { audio.currentTime = seekTo; }, { once: true });
       }
       audio.play().catch(() => {});
-      updateInfo(ep);
+      if (episodeChanged || !infoPanel.classList.contains('visible')) {
+        updateInfo(ep);
+      }
     }
 
     audio.addEventListener('ended', () => {
@@ -2137,15 +2197,15 @@
         playIcon.style.display = 'none';
         stopIcon.style.display = 'block';
         btn.setAttribute('aria-label', 'Stop');
-        if (!episodeLoaded) {
-          // First play — calculate broadcast position and load episode
-          const { index, seekTo } = findEpisodeAtPosition(getBroadcastPosition());
-          episodeLoaded = true;
-          playEpisode(index, seekTo);
-        } else {
-          // Resume — just play, countdown already ticking in real time
-          audio.play().catch(() => {});
-        }
+        clearTimeout(glowFadeTimeout);
+        glow.style.opacity = '';
+        glow2.style.opacity = '';
+        glow.classList.add('playing');
+        glow2.classList.add('playing');
+        // Always rejoin the broadcast at the current global position
+        const { index, seekTo } = findEpisodeAtPosition(getBroadcastPosition());
+        episodeLoaded = true;
+        playEpisode(index, seekTo);
       } else {
         playing = false;
         audio.pause();
@@ -2153,6 +2213,14 @@
         playIcon.style.display = 'block';
         stopIcon.style.display = 'none';
         btn.setAttribute('aria-label', 'Play');
+        glow.style.opacity = '0';
+        glow2.style.opacity = '0';
+        glowFadeTimeout = setTimeout(() => {
+          glow.classList.remove('playing');
+          glow2.classList.remove('playing');
+          glow.style.opacity = '';
+          glow2.style.opacity = '';
+        }, 2500);
       }
     });
   </script>
