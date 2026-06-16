@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EVAMM Radio – Schedule</title>
+  <link rel="icon" type="image/png" href="../favicon.png" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .logo { margin-top: 50px; width: 140px; }
+    .logo img { width: 100%; display: block; }
+    .page-title {
+      margin-top: 18px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #666;
+    }
+    .back-link {
+      margin-top: 6px;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #444;
+      text-decoration: none;
+    }
+    .back-link:hover { color: #aaa; }
+
+    .schedule-wrap {
+      width: 100%;
+      max-width: 560px;
+      padding: 0 24px;
+      margin-top: 48px;
+    }
+
+    .week-block { margin-bottom: 40px; }
+    .week-header {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #444;
+      font-weight: 400;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .week-header span.range { color: #333; font-size: 9px; letter-spacing: 0.1em; }
+
+    .entry-list { display: flex; flex-direction: column; gap: 10px; }
+    .entry {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid #161616;
+    }
+    .entry-when { font-size: 12px; color: #ccc; letter-spacing: 0.03em; white-space: nowrap; }
+    .entry-when .day { color: #fff; font-weight: 600; }
+    .entry-dj { font-size: 12px; color: #888; text-align: right; }
+    .empty-state {
+      font-size: 11px;
+      color: #444;
+      padding: 12px 0;
+      letter-spacing: 0.02em;
+    }
+
+    .entry-list-wrapper .entry:last-child { border-bottom: none; }
+
+    footer {
+      margin-top: 60px;
+      margin-bottom: 48px;
+      font-size: 9px;
+      color: #333;
+      letter-spacing: 0.1em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo">
+    <img src="../EVAMM_Logo_Morphed.jpg" alt="EVAMM Radio" />
+  </div>
+  <div class="page-title">Recording Schedule</div>
+
+  <div class="schedule-wrap">
+
+    <div class="week-block">
+      <div class="week-header">This Week <span class="range" id="thisWeekRange"></span></div>
+      <div class="entry-list" id="thisWeekList"><div class="empty-state">Loading…</div></div>
+    </div>
+
+    <div class="week-block">
+      <div class="week-header">Next Week <span class="range" id="nextWeekRange"></span></div>
+      <div class="entry-list" id="nextWeekList"><div class="empty-state">Loading…</div></div>
+    </div>
+
+  </div>
+
+  <footer><a class="back-link" href="/">← Back to EVAMM Radio</a></footer>
+
+  <script>
+    // ---- CONFIG ----
+    // Paste your SheetDB API endpoint here, e.g. "https://sheetdb.io/api/v1/abc123xyz"
+    const SHEETDB_URL = "https://sheetdb.io/api/v1/zs27az3psgbrw";
+
+    // Add new sessions directly in the Google Sheet connected to SheetDB —
+    // this page just reads and displays them.
+    // Expected Google Sheet columns (header row), case-insensitive:
+    // Date | Time | DJ
+
+    function pad(n) { return n.toString().padStart(2, '0'); }
+
+    function startOfWeek(d) {
+      // Week starts Monday
+      const date = new Date(d);
+      const day = date.getDay(); // 0 = Sunday
+      const diff = (day === 0 ? -6 : 1) - day;
+      date.setDate(date.getDate() + diff);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+
+    function fmtRange(start, end) {
+      const opts = { month: 'short', day: 'numeric' };
+      return `${start.toLocaleDateString('en-US', opts)} – ${end.toLocaleDateString('en-US', opts)}`;
+    }
+
+    function fmtEntry(dateObj, timeStr) {
+      const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+      const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      return { dayName, dateStr };
+    }
+
+    function parseTimeToLabel(timeStr) {
+      if (!timeStr) return '';
+      // Accepts "HH:MM" (24h) or already-formatted strings like "8:00 PM"
+      const match = timeStr.match(/^(\d{1,2}):(\d{2})/);
+      if (!match) return timeStr;
+      let h = parseInt(match[1], 10);
+      const m = match[2];
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      return `${h}:${m} ${ampm}`;
+    }
+
+    function renderList(container, entries) {
+      container.innerHTML = '';
+      if (!entries.length) {
+        container.innerHTML = '<div class="empty-state">No sessions scheduled.</div>';
+        return;
+      }
+      entries.forEach(e => {
+        const row = document.createElement('div');
+        row.className = 'entry';
+        const { dayName, dateStr } = fmtEntry(e._dateObj, e.Time);
+        row.innerHTML = `
+          <div class="entry-when"><span class="day">${dayName}</span> ${dateStr} · ${parseTimeToLabel(e.Time)}</div>
+          <div class="entry-dj">${e.DJ || ''}</div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    async function loadSchedule() {
+      const thisWeekList = document.getElementById('thisWeekList');
+      const nextWeekList = document.getElementById('nextWeekList');
+
+      if (!SHEETDB_URL || SHEETDB_URL.includes('PASTE_YOUR')) {
+        thisWeekList.innerHTML = '<div class="empty-state">Schedule not connected yet — add your SheetDB URL in schedule/index.html.</div>';
+        nextWeekList.innerHTML = '';
+        return;
+      }
+
+      try {
+        const res = await fetch(SHEETDB_URL);
+        const data = await res.json();
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const thisStart = startOfWeek(today);
+        const thisEnd = new Date(thisStart); thisEnd.setDate(thisStart.getDate() + 6);
+        const nextStart = new Date(thisStart); nextStart.setDate(thisStart.getDate() + 7);
+        const nextEnd = new Date(nextStart); nextEnd.setDate(nextStart.getDate() + 6);
+
+        document.getElementById('thisWeekRange').textContent = fmtRange(thisStart, thisEnd);
+        document.getElementById('nextWeekRange').textContent = fmtRange(nextStart, nextEnd);
+
+        const parsed = data
+          .map(row => {
+            const dateKey = row.Date || row.date;
+            const dateObj = dateKey ? new Date(dateKey + 'T00:00:00') : null;
+            return { ...row, DJ: row.DJ || row.dj || row['DJ Name'], Time: row.Time || row.time, _dateObj: dateObj };
+          })
+          .filter(e => e._dateObj && !isNaN(e._dateObj));
+
+        const thisWeekEntries = parsed
+          .filter(e => e._dateObj >= thisStart && e._dateObj <= thisEnd)
+          .sort((a, b) => a._dateObj - b._dateObj || (a.Time || '').localeCompare(b.Time || ''));
+
+        const nextWeekEntries = parsed
+          .filter(e => e._dateObj >= nextStart && e._dateObj <= nextEnd)
+          .sort((a, b) => a._dateObj - b._dateObj || (a.Time || '').localeCompare(b.Time || ''));
+
+        renderList(thisWeekList, thisWeekEntries);
+        renderList(nextWeekList, nextWeekEntries);
+      } catch (err) {
+        thisWeekList.innerHTML = '<div class="empty-state">Couldn\'t load the schedule.</div>';
+        nextWeekList.innerHTML = '';
+        console.error(err);
+      }
+    }
+
+    loadSchedule();
+  </script>
+
+</body>
+</html>
