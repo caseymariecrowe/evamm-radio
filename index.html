@@ -21,10 +21,10 @@
       align-items: center;
     }
     .logo { margin-top: 50px; width: 200px; }
-    .logo img { width: 100%; display: block; animation: logoIn 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+    .logo img { width: 100%; display: block; animation: logoIn 0.5s ease forwards; }
     @keyframes logoIn {
-      0%   { opacity: 0; transform: scale(0.85) scaleX(1.08) scaleY(0.92) skewX(3deg); }
-      100% { opacity: 1; transform: scale(1)    scaleX(1)    scaleY(1)    skewX(0deg); }
+      0%   { opacity: 0; }
+      100% { opacity: 1; }
     }
     .season-title, .season-years, #twitch-section, #radio-player-section, .social {
       animation: contentFadeIn 0.8s ease forwards;
@@ -338,7 +338,7 @@
 <body>
 
   <div class="logo">
-    <img src="EVAMM_Logo_Morphed.jpg" alt="EVAMM Radio" />
+    <img src="EVAMM_Logo_Animate_Web.gif" alt="EVAMM Radio" />
   </div>
   <div class="season-title">Season 1</div>
   <div class="season-years">2023 – 2026</div>
