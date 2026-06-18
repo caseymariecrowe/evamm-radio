@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EVAMM Radio – Live</title>
+  <link rel="icon" type="image/png" href="../favicon.png" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .logo { margin-top: 30px; width: 160px; }
+    .logo img { width: 100%; display: block; }
+    .back-link {
+      margin-top: 6px;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #444;
+      text-decoration: none;
+    }
+    .back-link:hover { color: #aaa; }
+    #twitch-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 40px;
+      width: 100%;
+      max-width: 720px;
+      padding: 0 24px 60px;
+    }
+    #twitch-embed {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+    }
+    #twitch-embed iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo">
+    <img id="evammLogo" alt="EVAMM Radio" />
+  </div>
+  <script>
+    document.getElementById('evammLogo').src = '../EVAMM_Logo_Animate_Web.gif?v=' + Date.now();
+  </script>
+  <a class="back-link" href="/">EVAMM Radio Archive</a>
+
+  <div id="twitch-section">
+    <div id="twitch-embed"></div>
+  </div>
+
+  <script src="https://embed.twitch.tv/embed/v1.js"></script>
+  <script>
+    new Twitch.Embed('twitch-embed', {
+      channel: 'evammradio',
+      parent: ['evammradio.com', 'localhost'],
+      layout: 'video',
+      autoplay: true,
+      muted: false
+    });
+  </script>
+
+</body>
+</html>
