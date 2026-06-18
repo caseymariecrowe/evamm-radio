@@ -338,8 +338,11 @@
 <body>
 
   <div class="logo">
-    <img src="EVAMM_Logo_Animate_Web.gif" alt="EVAMM Radio" />
+    <img id="evammLogo" alt="EVAMM Radio" />
   </div>
+  <script>
+    document.getElementById('evammLogo').src = 'EVAMM_Logo_Animate_Web.gif?v=' + Date.now();
+  </script>
   <div class="season-title">Season 1</div>
   <div class="season-years">2023 – 2026</div>
 
